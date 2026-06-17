@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="page-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>أهلاً بك، أحمد حسن 👋</h1>
+                            <p>إليك ملخص لنشاطك اليوم في شير جير</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="window.showToast('تم تحديث البيانات بنجاح')">تحديث البيانات</button>
+                        </div>
+                    </header>
+
+                    <!-- Stats Widgets -->
+                    <div class="dashboard-grid animate-on-scroll">
+                        <div class="card widget-card" style="cursor: pointer;" onclick="window.navigateTo('bookings.html')">
+                            <div class="widget-info">
+                                <p>الحجوزات النشطة</p>
+                                <h3>3</h3>
+                            </div>
+                            <div class="widget-icon">🏗️</div>
+                        </div>
+                        <div class="card widget-card" style="cursor: pointer;" onclick="window.navigateTo('wallet.html')">
+                            <div class="widget-info">
+                                <p>رصيد المحفظة</p>
+                                <h3>15,400 ريال</h3>
+                            </div>
+                            <div class="widget-icon">💳</div>
+                        </div>
+                        <div class="card widget-card" style="cursor: pointer;" onclick="window.navigateTo('messages.html')">
+                            <div class="widget-info">
+                                <p>الرسائل الجديدة</p>
+                                <h3>5</h3>
+                            </div>
+                            <div class="widget-icon">💬</div>
+                        </div>
+                        <div class="card widget-card" style="cursor: pointer;" onclick="window.navigateTo('orders.html')">
+                            <div class="widget-info">
+                                <p>الطلبات المكتملة</p>
+                                <h3>12</h3>
+                            </div>
+                            <div class="widget-icon">✅</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-content-layout">
+                        <!-- Active Bookings -->
+                        <section class="card animate-on-scroll">
+                            <div class="card-header">
+                                <h2 class="card-title">تتبع الحجوزات الحالية</h2>
+                            </div>
+                            <div id="active-bookings-list" class="flex flex-col gap-4">
+                                <!-- Bookings will be loaded here -->
+                                <div class="skeleton" style="height: 100px;"></div>
+                                <div class="skeleton" style="height: 100px;"></div>
+                            </div>
+                        </section>
+
+                        <!-- AI Recommendations -->
+                        <aside class="card animate-on-scroll" style="background: var(--dark-accent); color: white; border: none; height: fit-content;">
+                            <div class="badge badge-warning">توصية الذكاء الاصطناعي</div>
+                            <h3 style="margin: 20px 0 10px;">تحسين التكاليف للمشاريع</h3>
+                            <p style="font-size: 0.9rem; opacity: 0.8; line-height: 1.6;">بناءً على موقعك الحالي في "مدينة نصر"، نوصي بالتعامل مع شركة "النور للأوناش" لتوفير 15% من تكاليف النقل.</p>
+                            <button class="btn btn-primary w-full" style="margin-top: 24px;">استكشف العرض</button>
+                        </aside>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const bookingsList = document.getElementById('active-bookings-list');
+            try {
+                const bookings = await API.getBookings();
+                bookingsList.innerHTML = bookings.map(b => `
+                    <div class="card" style="padding: var(--s4); border-style: dashed; transform: none; box-shadow: none;">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 style="margin-bottom: 4px;">${b.service_name}</h4>
+                                <p class="text-muted" style="font-size: var(--text-sm);">${b.provider} | ${b.date}</p>
+                            </div>
+                            <span class="badge ${b.status === 'active' ? 'badge-success' : 'badge-warning'}">${b.status_ar}</span>
+                        </div>
+                        <div class="progress-container" style="margin-top: 16px;">
+                            <div class="progress-bar" style="width: ${b.progress}%"></div>
+                        </div>
+                        <p style="font-size: var(--text-xs); text-align: left; margin-top: 4px;">${b.progress}% مكتمل</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load bookings:', error);
+                bookingsList.innerHTML = '<p class="text-muted">فشل تحميل البيانات</p>';
+            }
+        });
+    </script>
+</body>
+</html>

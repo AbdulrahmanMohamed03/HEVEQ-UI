@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة الرغبات | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>قائمة الرغبات</h1>
+                    <p style="color: var(--text-muted);">المعدات والمنتجات التي تهتم بمتابعتها</p>
+                </div>
+            </header>
+
+            <div id="wishlist-grid" class="product-grid">
+                <!-- Loaded via JS -->
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grid = document.getElementById('wishlist-grid');
+            const equipment = await API.getEquipment();
+
+            // Mock wishlist
+            grid.innerHTML = [equipment[0]].map(e => `
+                <div class="card product-card animate-on-scroll">
+                    <div class="product-img">
+                        <img src="${e.image}" alt="${e.name}">
+                        <button class="btn btn-outline btn-icon" style="position: absolute; top: 10px; left: 10px; background: white; border-color: var(--danger); color: var(--danger);">❤️</button>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-price">${e.price.toLocaleString()} ريال</div>
+                        <h3 class="card-title">${e.name}</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">بائع موثوق | 📍 ${e.location}</p>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="navigateTo('product-details.html')">عرض المنتج</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+    </script></body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلباتي | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>طلبات الشراء</h1>
+                    <p style="color: var(--text-muted);">متابعة مشترياتك من المعدات وقطع الغيار</p>
+                </div>
+            </header>
+
+            <div class="card animate-on-scroll">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>المنتج</th>
+                                <th>البائع</th>
+                                <th>التاريخ</th>
+                                <th>الإجمالي</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#ORD-55902</strong></td>
+                                <td>حفار كاتر بيلر 320D</td>
+                                <td>شركة النور</td>
+                                <td>15 يونيو 2026</td>
+                                <td>519,000 ريال</td>
+                                <td><span class="badge badge-warning">قيد المراجعة</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-icon" onclick="window.navigateTo('order-tracking.html')">📍</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#ORD-55801</strong></td>
+                                <td>طقم فلاتر هيدروليك</td>
+                                <td>السويدي إليكتريك</td>
+                                <td>10 يونيو 2026</td>
+                                <td>1,450 ريال</td>
+                                <td><span class="badge badge-success">تم التسليم</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-icon">👁️</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحقق من الرمز | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-main) 0%, rgba(244, 163, 0, 0.05) 100%);
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+        }
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 30px 0;
+            direction: ltr;
+        }
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: var(--bg-card);
+        }
+        .otp-input:focus { border-color: var(--primary); outline: none; }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="auth-wrapper">
+        <div class="card auth-card animate-on-scroll">
+            <h2>تحقق من هويتك</h2>
+            <p style="color: var(--text-muted); margin-top: 10px;">أدخل الرمز المكون من 4 أرقام المرسل إلى هاتفك</p>
+
+            <form id="otp-form">
+                <div class="otp-inputs">
+                    <input type="text" class="otp-input" maxlength="1" required autofocus>
+                    <input type="text" class="otp-input" maxlength="1" required>
+                    <input type="text" class="otp-input" maxlength="1" required>
+                    <input type="text" class="otp-input" maxlength="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px;">تأكيد الرمز</button>
+            </form>
+
+            <div style="margin-top: 25px; font-size: 0.9rem; color: var(--text-muted);">
+                لم يصلك الرمز؟ <a href="#" style="color: var(--primary); font-weight: 700;">إعادة إرسال (59ث)</a>
+            </div>
+        </div>
+    </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        const inputs = document.querySelectorAll('.otp-input');
+        inputs.forEach((input, index) => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key >= 0 && e.key <= 9) {
+                    if (index < inputs.length - 1) inputs[index + 1].focus();
+                } else if (e.key === 'Backspace') {
+                    if (index > 0) inputs[index - 1].focus();
+                }
+            });
+        });
+
+        document.getElementById('otp-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            window.showToast('تم التحقق بنجاح! يمكنك الآن تسجيل الدخول');
+            setTimeout(() => window.navigateTo('login.html'), 1500);
+        });
+    </script></body>
+</html>

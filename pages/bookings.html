@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجوزاتي | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>حجوزاتي</h1>
+                    <p style="color: var(--text-muted);">إدارة ومتابعة جميع طلباتك الحالية والسابقة</p>
+                </div>
+            </header>
+
+            <div class="card animate-on-scroll">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الحجز</th>
+                                <th>الخدمة / المعدة</th>
+                                <th>المزود</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tableBody = document.getElementById('bookings-table-body');
+            const bookings = await API.getBookings();
+
+            tableBody.innerHTML = bookings.map(b => `
+                <tr>
+                    <td><strong>#${b.id}</strong></td>
+                    <td>${b.service_name}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="avatar" style="width: 24px; height: 24px; font-size: 0.6rem;">${b.provider[0]}</div>
+                            ${b.provider}
+                        </div>
+                    </td>
+                    <td>${b.date}</td>
+                    <td>${b.amount.toLocaleString()} ريال</td>
+                    <td><span class="badge ${b.status === 'active' ? 'badge-success' : 'badge-warning'}">${b.status_ar}</span></td>
+                    <td>
+                        <button class="btn btn-outline btn-icon" title="عرض التفاصيل" onclick="window.navigateTo('booking-details.html')">👁️</button>
+                        <button class="btn btn-outline btn-icon" title="تتبع الموقع">📍</button>
+                    </td>
+                </tr>
+            `).join('');
+        });
+    </script></body>
+</html>

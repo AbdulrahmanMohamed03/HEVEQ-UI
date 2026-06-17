@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلبات الحجز | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>طلبات الحجز الواردة</h1>
+                    <p style="color: var(--text-muted);">مراجعة وتأكيد طلبات تأجير المعدات والخدمات</p>
+                </div>
+            </header>
+
+            <div class="card animate-on-scroll">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>العميل</th>
+                                <th>المعدة / الخدمة</th>
+                                <th>التاريخ والمدة</th>
+                                <th>المبلغ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#BK-10023</strong></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="avatar" style="width: 24px; height: 24px; font-size: 0.6rem;">أ</div>
+                                        أحمد حسن
+                                    </div>
+                                </td>
+                                <td>حفار كاتر بيلر 320D</td>
+                                <td>
+                                    20 يونيو 2026<br>
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">لمدة 3 أيام</span>
+                                </td>
+                                <td><span style="color: var(--primary); font-weight: 700;">5,400 ريال</span></td>
+                                <td>
+                                    <button class="btn btn-primary btn-icon" style="padding: 5px 10px;" onclick="window.showToast('تم قبول الطلب بنجاح. تم نقل المهمة إلى المهام النشطة'); setTimeout(() => window.navigateTo('active-jobs.html'), 1500)">قبول ✓</button>
+                                    <button class="btn btn-outline btn-icon" style="padding: 5px 10px; color: var(--danger); border-color: var(--danger);" onclick="window.showToast('تم رفض الطلب')">رفض ✗</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#BK-10024</strong></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="avatar" style="width: 24px; height: 24px; font-size: 0.6rem;">خ</div>
+                                        خالد سعيد
+                                    </div>
+                                </td>
+                                <td>ونش تادانو 50 طن</td>
+                                <td>
+                                    25 يونيو 2026<br>
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">لمدة 1 يوم</span>
+                                </td>
+                                <td><span style="color: var(--primary); font-weight: 700;">850 ريال</span></td>
+                                <td>
+                                    <button class="btn btn-primary btn-icon" style="padding: 5px 10px;" onclick="window.showToast('تم قبول الطلب بنجاح. تم نقل المهمة إلى المهام النشطة'); setTimeout(() => window.navigateTo('active-jobs.html'), 1500)">قبول ✓</button>
+                                    <button class="btn btn-outline btn-icon" style="padding: 5px 10px; color: var(--danger); border-color: var(--danger);" onclick="window.showToast('تم رفض الطلب')">رفض ✗</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

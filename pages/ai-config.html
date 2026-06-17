@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات الذكاء الاصطناعي | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar { background: var(--dark); color: white; border-left: none; }
+        .admin-sidebar .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar .nav-link:hover, .admin-sidebar .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+            <div class="section-title">
+                <h1>تكوين الذكاء الاصطناعي (AI Engine)</h1>
+                <p>إدارة معايير الخوارزميات، ونماذج التسعير الديناميكي، وكشف الاحتيال</p>
+            </div>
+            <button class="btn btn-primary" onclick="window.showToast('تم حفظ التكوينات بنجاح')">حفظ الإعدادات</button>
+        </header>
+
+        <div class="dashboard-grid animate-on-scroll">
+            <div class="card">
+                <h3 style="margin-bottom: 20px;">تسعير الطلب الديناميكي</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span>تفعيل التسعير الذكي</span>
+                    <input type="checkbox" class="form-input" checked style="width: auto;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الحد الأقصى للزيادة أوقات الذروة (%)</label>
+                    <input type="number" class="form-input" value="25" style="width: 100%;">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 20px;">محرك كشف الاحتيال</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span>التعليق التلقائي للحسابات المشبوهة</span>
+                    <input type="checkbox" class="form-input" style="width: auto;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">حساسية المؤشر (1-10)</label>
+                    <input type="range" min="1" max="10" value="7" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                        <span>منخفض</span>
+                        <span>عالي جداً</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 20px;">خوارزمية المطابقة (Matching)</h3>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label">أولوية الموقع الجغرافي (%)</label>
+                    <input type="number" class="form-input" value="60" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">أولوية التقييم والموثوقية (%)</label>
+                    <input type="number" class="form-input" value="40" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

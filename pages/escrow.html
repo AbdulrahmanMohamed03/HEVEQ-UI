@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الضمان (Escrow) | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar { background: var(--dark); color: white; border-left: none; }
+        .admin-sidebar .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar .nav-link:hover, .admin-sidebar .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+            <div class="section-title">
+                <h1>نظام الضمان (Escrow Monitoring)</h1>
+                <p>مراقبة الأموال المحتجزة وعمليات التحرير (Payouts)</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="window.showToast('جاري تصدير التقرير...')">تصدير تقرير مالي 📥</button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid animate-on-scroll">
+            <div class="card widget-card">
+                <div class="widget-info">
+                    <p>إجمالي الرصيد المحجوز</p>
+                    <h3 style="color: var(--primary);">2,450,000 ريال</h3>
+                </div>
+                <div class="widget-icon">🔒</div>
+            </div>
+            <div class="card widget-card">
+                <div class="widget-info">
+                    <p>دفعات جاهزة للتحرير</p>
+                    <h3 style="color: var(--success);">125,000 ريال</h3>
+                </div>
+                <div class="widget-icon">💸</div>
+            </div>
+            <div class="card widget-card">
+                <div class="widget-info">
+                    <p>دفعات مجمدة (نزاعات)</p>
+                    <h3 style="color: var(--danger);">18,400 ريال</h3>
+                </div>
+                <div class="widget-icon">🛑</div>
+            </div>
+        </div>
+
+        <div class="card animate-on-scroll">
+            <h3 style="margin-bottom: 20px;">العمليات الأخيرة</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>معرف الدفعة</th>
+                            <th>رقم الحجز</th>
+                            <th>المزود المستفيد</th>
+                            <th>المبلغ</th>
+                            <th>الحالة</th>
+                            <th>تاريخ التحرير المتوقع</th>
+                            <th>الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ESC-5592</td>
+                            <td>#BK-1002</td>
+                            <td>السويدي إليكتريك</td>
+                            <td>1,200 ريال</td>
+                            <td><span class="badge badge-success">جاهز للتحرير</span></td>
+                            <td>اليوم</td>
+                            <td><button class="btn btn-primary btn-icon" style="padding: 5px 10px;" onclick="window.showToast('تم تحرير الدفعة')">تحرير يدوي 💸</button></td>
+                        </tr>
+                        <tr>
+                            <td>#ESC-5591</td>
+                            <td>#BK-1001</td>
+                            <td>المقاولون العرب</td>
+                            <td>5,400 ريال</td>
+                            <td><span class="badge badge-warning">محجوز (العمل جاري)</span></td>
+                            <td>23 يونيو 2026</td>
+                            <td><button class="btn btn-outline btn-icon" style="padding: 5px 10px;" disabled>معلق</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

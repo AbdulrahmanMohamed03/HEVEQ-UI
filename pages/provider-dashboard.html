@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المزود | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .trust-meter { width: 100px; height: 100px; position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .trust-meter svg { transform: rotate(-90deg); }
+        .trust-meter circle { fill: none; stroke-width: 8; stroke-linecap: round; }
+        .trust-meter .bg { stroke: var(--border-color); }
+        .trust-meter .progress { stroke: var(--success); transition: stroke-dashoffset 1s ease; }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="page-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>لوحة تحكم المزود - المقاولون العرب</h1>
+                            <p>أداء رائع! نقاط الجودة الخاصة بك ارتفعت بنسبة 5% هذا الشهر.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="navigateTo('create-listing.html')">إضافة خدمة جديدة +</button>
+                        </div>
+                    </header>
+
+                    <div class="dashboard-grid animate-on-scroll">
+                        <div class="card widget-card" style="cursor: pointer;" onclick="window.navigateTo('earnings.html')">
+                            <div class="widget-info">
+                                <p>إجمالي الأرباح</p>
+                                <h3>125,400 ريال</h3>
+                            </div>
+                            <div class="widget-icon">💰</div>
+                        </div>
+                        <div class="card widget-card" style="cursor: pointer;" onclick="window.navigateTo('active-jobs.html')">
+                            <div class="widget-info">
+                                <p>الوظائف النشطة</p>
+                                <h3>8</h3>
+                            </div>
+                            <div class="widget-icon">🏗️</div>
+                        </div>
+                        <div class="card widget-card" style="cursor: pointer;" onclick="window.navigateTo('equipment.html')">
+                            <div class="widget-info">
+                                <p>المعدات المتاحة</p>
+                                <h3>12 / 15</h3>
+                            </div>
+                            <div class="widget-icon">🚜</div>
+                        </div>
+                        <div class="card widget-card" style="text-align: center; display: block;">
+                            <div class="trust-meter">
+                                <svg width="100" height="100">
+                                    <circle class="bg" cx="50" cy="50" r="40"></circle>
+                                    <circle class="progress" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="25.12"></circle>
+                                </svg>
+                                <strong style="position: absolute; font-size: 1.2rem;">90%</strong>
+                            </div>
+                            <p style="font-size: 0.8rem; font-weight: 700; color: var(--success); margin-top: 8px;">درجة الموثوقية</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-content-layout">
+                        <section class="card animate-on-scroll">
+                            <div class="card-header">
+                                <h2 class="card-title">طلبات الحجز الجديدة</h2>
+                                <a href="booking-requests.html" class="btn btn-outline" style="padding: 4px 12px; font-size: var(--text-xs);">عرض الكل</a>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>العميل</th>
+                                            <th>المعدة</th>
+                                            <th>المدة</th>
+                                            <th>المبلغ</th>
+                                            <th>الإجراء</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>أحمد حسن</td>
+                                            <td>ونش تادانو</td>
+                                            <td>3 أيام</td>
+                                            <td>5,400 ريال</td>
+                                            <td>
+                                                <div class="flex gap-2">
+                                                    <button class="btn btn-primary btn-icon">✅</button>
+                                                    <button class="btn btn-outline btn-icon" style="color: var(--danger); border-color: var(--danger);">❌</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <aside class="card animate-on-scroll" style="background: var(--dark-accent); color: white; border: none; height: fit-content;">
+                            <div class="badge badge-warning">اقتراح ذكي (AI)</div>
+                            <h3 style="margin: 20px 0 10px;">تحسين ظهور قائمتك</h3>
+                            <p style="font-size: 0.9rem; opacity: 0.8; line-height: 1.6;">بناءً على اتجاهات السوق، نوصي بتحديث صور "حفار كوماتسو" وإضافة فيديو تشغيلي لزيادة الحجوزات بنسبة 20%.</p>
+                            <button class="btn btn-primary w-full" style="margin-top: 24px;">تطبيق التحسينات</button>
+                        </aside>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+</body>
+</html>

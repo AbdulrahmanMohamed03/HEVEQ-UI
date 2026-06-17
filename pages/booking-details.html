@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الحجز | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .booking-details-layout { display: grid; grid-template-columns: 1fr 350px; gap: 30px; margin-top: 40px; }
+        .timeline-vertical { position: relative; padding-right: 30px; }
+        .timeline-vertical::before { content: ''; position: absolute; right: 7px; top: 0; height: 100%; width: 2px; background: var(--border-color); }
+        .timeline-v-item { position: relative; margin-bottom: 30px; }
+        .timeline-v-item::before { content: ''; position: absolute; right: -28px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--border-color); border: 2px solid var(--bg-card); z-index: 2; }
+        .timeline-v-item.active::before { background: var(--primary); }
+        .timeline-v-item.completed::before { background: var(--success); }
+        @media (max-width: 992px) { .booking-details-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <nav style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-muted);">
+                        <a href="bookings.html">حجوزاتي</a> > #BK-1001
+                    </nav>
+                    <h1>تفاصيل الحجز #BK-1001</h1>
+                </div>
+                <div class="actions" style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline" onclick="window.showToast('جاري تحضير الفاتورة...')">تحميل الفاتورة 📄</button>
+                    <button class="btn btn-primary" onclick="window.navigateTo('messages.html')">تواصل مع المزود 💬</button>
+                </div>
+            </header>
+
+            <div class="booking-details-layout">
+                <div class="main-content">
+                    <div class="card animate-on-scroll" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px;">حالة التنفيذ</h3>
+                        <div class="timeline-vertical">
+                            <div class="timeline-v-item completed">
+                                <strong>تم تأكيد الطلب</strong>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">15 يونيو 2026 - 10:30 صباحاً</p>
+                            </div>
+                            <div class="timeline-v-item completed">
+                                <strong>تم الدفع (نظام الضمان)</strong>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">15 يونيو 2026 - 10:45 صباحاً</p>
+                            </div>
+                            <div class="timeline-v-item active">
+                                <strong>المعدة في الطريق إلى الموقع</strong>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">جاري التتبع الآن...</p>
+                                <div class="card" style="margin-top: 15px; padding: 10px; background: var(--bg-main);">
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <span>📍</span>
+                                        <span style="font-size: 0.85rem;">المسافة المتبقية: 12 كم (20 دقيقة)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-v-item">
+                                <strong>بدء العمل</strong>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">بانتظار وصول المعدة للموقع</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card animate-on-scroll">
+                        <h3 style="margin-bottom: 20px;">تفاصيل الخدمة</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-muted);">المعدة</label>
+                                <p><strong>ونش تادانو 50 طن</strong></p>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-muted);">المزود</label>
+                                <p><strong>المقاولون العرب</strong></p>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-muted);">تاريخ البدء</label>
+                                <p><strong>20 يونيو 2026</strong></p>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-muted);">المدة</label>
+                                <p><strong>3 أيام</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="sidebar-info">
+                    <div class="card animate-on-scroll" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px;">ملخص الدفع</h3>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>الإجمالي</span>
+                            <strong>5,400 ريال</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>حالة الدفع</span>
+                            <span class="badge badge-success">مدفوع (محجوز)</span>
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">المبلغ محجوز في نظام الضمان وسيتم تحويله للمزود فور تأكيدك للإنجاز.</p>
+                    </div>
+
+                    <div class="card animate-on-scroll">
+                        <h3 style="margin-bottom: 15px;">هل تواجه مشكلة؟</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">إذا كان لديك أي استفسار أو شكوى بخصوص هذا الحجز، يمكنك فتح تذكرة دعم.</p>
+                        <button class="btn btn-outline" style="width: 100%; color: var(--danger); border-color: var(--danger);">فتح نزاع ⚖️</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

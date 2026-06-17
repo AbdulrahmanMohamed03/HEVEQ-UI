@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المعدات | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>إدارة أسطول المعدات</h1>
+                    <p style="color: var(--text-muted);">إضافة وتحديث المعدات المتاحة للإيجار أو البيع</p>
+                </div>
+                <button class="btn btn-primary" onclick="openModal()">إضافة معدة جديدة +</button>
+            </header>
+
+            <div class="product-grid" id="fleet-grid">
+                <!-- Data will be loaded via JS -->
+            </div>
+        </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Edit/Add Modal -->
+    <div class="modal" id="equipment-modal">
+        <div class="modal-content card">
+            <span class="close-modal" onclick="closeModal()">×</span>
+            <h2 id="modal-title" style="margin-bottom: 25px;">إضافة معدة جديدة</h2>
+            
+            <form id="equipment-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label class="form-label">اسم المعدة / الموديل</label>
+                    <input type="text" id="eq-name" class="form-input" placeholder="مثال: حفار كاتر بيلر 320D" required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">الموقع</label>
+                        <input type="text" id="eq-location" class="form-input" placeholder="مثال: الرياض" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الحالة</label>
+                        <select id="eq-status" class="form-input">
+                            <option value="available">متاح</option>
+                            <option value="busy">في مهمة</option>
+                            <option value="maintenance">صيانة</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">السعر (ريال/يوم)</label>
+                        <input type="number" id="eq-price" class="form-input" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">التصنيف</label>
+                        <select id="eq-category" class="form-input">
+                            <option value="excavators">حفارات</option>
+                            <option value="cranes">أوناش</option>
+                            <option value="loaders">لوادر</option>
+                            <option value="generators">مولدات</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">رابط صورة المعدة</label>
+                    <input type="url" id="eq-image" class="form-input" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">وصف إضافي</label>
+                    <textarea id="eq-desc" class="form-input" style="height: 100px; resize: none;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">حفظ البيانات</button>
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let fleetData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadFleet();
+
+            document.getElementById('equipment-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveEquipment();
+            });
+        });
+
+        async function loadFleet() {
+            const grid = document.getElementById('fleet-grid');
+            if (!fleetData.length) {
+                fleetData = await API.getEquipment();
+            }
+
+            grid.innerHTML = fleetData.map(e => `
+                <div class="card product-card animate-on-scroll">
+                    <div class="product-img">
+                        <img src="${e.image}" alt="${e.name}">
+                        <span class="badge ${getStatusClass(e.status)}" style="position: absolute; top: 10px; right: 10px;">
+                            ${getStatusLabel(e.status)}
+                        </span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="card-title">${e.name}</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">ID: #EQ-00${e.id} | 📍 ${e.location}</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline btn-icon" style="flex: 1;" onclick="openModal(${e.id})">تعديل ✏️</button>
+                            <button class="btn btn-outline btn-icon" style="flex: 1;" onclick="window.showToast('جاري فتح جدول العمل...')">الجدول 📅</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'available': return 'badge-success';
+                case 'busy': return 'badge-warning';
+                case 'maintenance': return 'badge-danger';
+                default: return 'badge-outline';
+            }
+        }
+
+        function getStatusLabel(status) {
+            switch(status) {
+                case 'available': return 'متاح';
+                case 'busy': return 'في مهمة';
+                case 'maintenance': return 'صيانة';
+                default: return status;
+            }
+        }
+
+        function openModal(id = null) {
+            const modal = document.getElementById('equipment-modal');
+            const title = document.getElementById('modal-title');
+            const form = document.getElementById('equipment-form');
+            
+            form.reset();
+            document.getElementById('edit-id').value = '';
+
+            if (id) {
+                const item = fleetData.find(e => e.id === id);
+                if (item) {
+                    title.innerText = 'تعديل بيانات المعدة';
+                    document.getElementById('edit-id').value = item.id;
+                    document.getElementById('eq-name').value = item.name;
+                    document.getElementById('eq-location').value = item.location;
+                    document.getElementById('eq-status').value = item.status;
+                    document.getElementById('eq-price').value = item.price || '';
+                    document.getElementById('eq-image').value = item.image;
+                }
+            } else {
+                title.innerText = 'إضافة معدة جديدة';
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('equipment-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function saveEquipment() {
+            const id = document.getElementById('edit-id').value;
+            const name = document.getElementById('eq-name').value;
+            const location = document.getElementById('eq-location').value;
+            const status = document.getElementById('eq-status').value;
+            const price = document.getElementById('eq-price').value;
+            const image = document.getElementById('eq-image').value || 'https://images.unsplash.com/photo-1579407569100-33068e64c3c3?auto=format&fit=crop&w=800&q=80';
+
+            if (id) {
+                // Update
+                const index = fleetData.findIndex(e => e.id == id);
+                fleetData[index] = { ...fleetData[index], name, location, status, price, image };
+                window.showToast('تم تحديث بيانات المعدة بنجاح');
+            } else {
+                // Add
+                const newId = fleetData.length ? Math.max(...fleetData.map(f => f.id)) + 1 : 1;
+                fleetData.push({ id: newId, name, location, status, price, image });
+                window.showToast('تم إضافة المعدة الجديدة بنجاح');
+            }
+
+            closeModal();
+            loadFleet();
+        }
+    </script></body>
+</html>

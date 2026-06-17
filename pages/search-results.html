@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائج البحث | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <main class="container" style="padding: 40px 0;">
+        <header class="section-header">
+            <div class="section-title">
+                <h1>نتائج البحث عن "حفارات"</h1>
+                <p style="color: var(--text-muted);">تم العثور على 24 نتيجة تطابق بحثك</p>
+            </div>
+            <div class="filter-actions" style="display: flex; gap: 10px;">
+                <select class="form-input" style="padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <option>الأحدث أولاً</option>
+                    <option>الأقل سعراً</option>
+                    <option>الأعلى تقييماً</option>
+                </select>
+                <button class="btn btn-outline">تصفية 🔍</button>
+            </div>
+        </header>
+
+        <div class="search-layout" style="display: grid; grid-template-columns: 280px 1fr; gap: 30px; margin-top: 40px;">
+            <!-- Filters Sidebar -->
+            <aside class="card filters-sidebar" style="height: fit-content;">
+                <h3 style="margin-bottom: 20px;">تصفية النتائج</h3>
+                
+                <div class="filter-group" style="margin-bottom: 25px;">
+                    <label class="form-label">السعر (ريال)</label>
+                    <input type="range" style="width: 100%; margin: 10px 0;" min="100" max="1000000">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                        <span>100</span>
+                        <span>1,000,000</span>
+                    </div>
+                </div>
+
+                <div class="filter-group" style="margin-bottom: 25px;">
+                    <label class="form-label">الموقع</label>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <label><input type="checkbox"> الرياض</label>
+                        <label><input type="checkbox"> جدة</label>
+                        <label><input type="checkbox"> الدمام</label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="form-label">التقييم</label>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <label><input type="checkbox"> ⭐⭐⭐⭐⭐ (5)</label>
+                        <label><input type="checkbox"> ⭐⭐⭐⭐ (4+)</label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Results Grid -->
+            <div id="results-grid" class="product-grid">
+                <!-- Skeletons -->
+                <div class="card skeleton" style="height: 350px;"></div>
+                <div class="card skeleton" style="height: 350px;"></div>
+                <div class="card skeleton" style="height: 350px;"></div>
+            </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const resultsGrid = document.getElementById('results-grid');
+            const equipment = await API.getEquipment();
+
+            // Simulate multiple results
+            const results = [...equipment, ...equipment]; 
+
+            resultsGrid.innerHTML = results.map(e => `
+                <div class="card product-card animate-on-scroll">
+                    <div class="product-img">
+                        <img src="${e.image}" alt="${e.name}">
+                        <span class="badge badge-success product-tag">متاح</span>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-price">${e.price.toLocaleString()} ريال</div>
+                        <h3 class="card-title">${e.name}</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">تقييم المزود: ⭐⭐⭐⭐⭐</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="status-chip">📍 ${e.location}</div>
+                            <button class="btn btn-primary btn-icon" onclick="window.navigateTo('service-details.html')">👁️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        });
+    </script></body>
+</html>

@@ -1,0 +1,22 @@
+[
+    {
+        "id": "BK-1001",
+        "service_name": "تأجير ونش 50 طن",
+        "provider": "المقاولون العرب",
+        "date": "2026-06-20",
+        "status": "active",
+        "status_ar": "نشط",
+        "amount": 5400,
+        "progress": 65
+    },
+    {
+        "id": "BK-1002",
+        "service_name": "صيانة مولد كهرباء",
+        "provider": "السويدي إليكتريك",
+        "date": "2026-06-18",
+        "status": "pending",
+        "status_ar": "قيد الانتظار",
+        "amount": 1200,
+        "progress": 0
+    }
+]

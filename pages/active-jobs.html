@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مهام العمل النشطة | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>المهام النشطة</h1>
+                    <p style="color: var(--text-muted);">تتبع حالة المعدات والمشغلين في مواقع العمل الحالية</p>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <div class="card animate-on-scroll" style="border-right: 4px solid var(--primary);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span class="badge badge-warning">قيد التنفيذ</span>
+                        <strong style="color: var(--text-muted);">#BK-1001</strong>
+                    </div>
+                    <h3 style="margin-bottom: 5px;">حفر أساسات - التجمع الخامس</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">حفار كاتر بيلر 320D | المشغل: محمد علي</p>
+                    
+                    <div class="progress-container"><div class="progress-bar" style="width: 65%;"></div></div>
+                    <p style="font-size: 0.8rem; text-align: left; margin-bottom: 20px;">65% مكتمل</p>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-outline" style="flex: 1; font-size: 0.8rem;" onclick="window.showToast('تم إرسال طلب تحديث الحالة للمشغل')">تحديث الحالة</button>
+                        <button class="btn btn-primary btn-icon" title="تواصل مع العميل" onclick="window.navigateTo('messages.html')">💬</button>
+                    </div>
+                </div>
+
+                <div class="card animate-on-scroll" style="border-right: 4px solid var(--info);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span class="badge badge-info" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">في الطريق</span>
+                        <strong style="color: var(--text-muted);">#BK-1002</strong>
+                    </div>
+                    <h3 style="margin-bottom: 5px;">تنزيل مواد - العبور</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">ونش تادانو 50 طن | المشغل: أحمد محمود</p>
+                    
+                    <div class="progress-container"><div class="progress-bar" style="width: 10%;"></div></div>
+                    <p style="font-size: 0.8rem; text-align: left; margin-bottom: 20px;">المسافة المتبقية: 5 كم</p>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-outline" style="flex: 1; font-size: 0.8rem;">تتبع مباشر 📍</button>
+                        <button class="btn btn-primary btn-icon" title="تواصل مع العميل">💬</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

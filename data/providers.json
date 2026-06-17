@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "المقاولون العرب",
+        "logo": "🏗️",
+        "rating": 4.9,
+        "reviews_count": 1200,
+        "status": "verified",
+        "location": "القاهرة، مصر",
+        "description": "شركة رائدة في مجال الإنشاءات والمقاولات."
+    },
+    {
+        "id": 2,
+        "name": "السويدي إليكتريك",
+        "logo": "⚡",
+        "rating": 4.8,
+        "reviews_count": 850,
+        "status": "verified",
+        "location": "العاشر من رمضان، مصر",
+        "description": "حلول طاقة وبنية تحتية متكاملة."
+    }
+]

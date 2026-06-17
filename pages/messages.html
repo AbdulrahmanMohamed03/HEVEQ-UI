@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الرسائل | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .messages-layout { display: grid; grid-template-columns: 350px 1fr; gap: 0; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; height: 700px; }
+        .chat-sidebar { border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .chat-list { overflow-y: auto; flex: 1; }
+        .chat-item { padding: 20px; display: flex; gap: 15px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid var(--border-color); }
+        .chat-item:hover, .chat-item.active { background: rgba(244, 163, 0, 0.05); }
+        .chat-content { flex: 1; display: flex; flex-direction: column; }
+        .chat-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; background: var(--bg-main); display: flex; flex-direction: column; gap: 15px; }
+        .message-bubble { max-width: 70%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5; }
+        .message-sent { align-self: flex-start; background: var(--primary); color: white; border-top-right-radius: 0; }
+        .message-received { align-self: flex-end; background: var(--bg-card); color: var(--text-main); border-top-left-radius: 0; border: 1px solid var(--border-color); }
+        .chat-footer { padding: 20px; border-top: 1px solid var(--border-color); }
+        @media (max-width: 768px) { .messages-layout { grid-template-columns: 1fr; } .chat-sidebar { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>مركز الرسائل</h1>
+                    <p style="color: var(--text-muted);">تواصل مباشرة مع مزودي الخدمة</p>
+                </div>
+            </header>
+
+            <div class="messages-layout animate-on-scroll">
+                <!-- Chat Sidebar -->
+                <aside class="chat-sidebar">
+                    <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                        <input type="text" class="form-input" placeholder="بحث في المحادثات..." style="width: 100%; padding: 10px;">
+                    </div>
+                    <div id="chat-list" class="chat-list">
+                        <!-- Loaded via JS -->
+                    </div>
+                </aside>
+
+                <!-- Active Chat Content -->
+                <div class="chat-content">
+                    <div class="chat-header">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div id="active-chat-avatar" class="avatar">🏗️</div>
+                            <div>
+                                <h4 id="active-chat-name">المقاولون العرب</h4>
+                                <span style="font-size: 0.75rem; color: var(--success);">● متصل الآن</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-icon">⚙️</button>
+                    </div>
+
+                    <div class="chat-body" id="chat-body">
+                        <div class="message-bubble message-received">أهلاً بك أحمد، كيف يمكننا مساعدتك اليوم؟</div>
+                        <div class="message-bubble message-sent">أحتاج لمعرفة موعد وصول الحفار لموقع العمل في التجمع.</div>
+                        <div class="message-bubble message-received">المعدة في طريقها إليكم الآن، ومن المتوقع وصولها خلال 30 دقيقة.</div>
+                        <div class="message-bubble message-sent">ممتاز، شكراً جزيلاً.</div>
+                    </div>
+
+                    <div class="chat-footer">
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline btn-icon">📎</button>
+                            <input type="text" id="chat-input" class="form-input" placeholder="اكتب رسالتك هنا..." style="flex: 1;">
+                            <button class="btn btn-primary" id="send-btn">إرسال</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const chatList = document.getElementById('chat-list');
+            const messages = await API.getMessages();
+
+            chatList.innerHTML = messages.map(m => `
+                <div class="chat-item ${m.id === 1 ? 'active' : ''}" onclick="selectChat(${m.id})">
+                    <div class="avatar">${m.avatar}</div>
+                    <div style="flex: 1; overflow: hidden;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong>${m.name}</strong>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">${m.time}</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${m.last_message}
+                        </p>
+                    </div>
+                    ${m.unread_count > 0 ? `<span class="badge badge-success" style="padding: 2px 6px;">${m.unread_count}</span>` : ''}
+                </div>
+            `).join('');
+
+            const sendBtn = document.getElementById('send-btn');
+            const chatInput = document.getElementById('chat-input');
+            const chatBody = document.getElementById('chat-body');
+
+            sendBtn.addEventListener('click', () => {
+                if (chatInput.value.trim()) {
+                    const msg = document.createElement('div');
+                    msg.className = 'message-bubble message-sent';
+                    msg.innerText = chatInput.value;
+                    chatBody.appendChild(msg);
+                    chatInput.value = '';
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }
+            });
+        });
+
+        function selectChat(id) {
+            // Logic to switch active chat
+            document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+            // Mock switch
+            window.showToast('تم الانتقال للمحادثة');
+        }
+    </script></body>
+</html>

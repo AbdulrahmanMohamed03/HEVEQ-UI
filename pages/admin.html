@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز القيادة | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .risk-value { font-size: 2.5rem; font-weight: 900; color: var(--danger); }
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="page-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>مركز القيادة والتحكم</h1>
+                            <p>مراقبة حية لعمليات المنصة والمؤشرات الحيوية</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);">إيقاف الطوارئ (Kill Switch)</button>
+                        </div>
+                    </header>
+
+                    <div class="dashboard-grid animate-on-scroll">
+                        <div class="card" style="border-right: 4px solid var(--danger); background: rgba(239, 68, 68, 0.02); transform: none; box-shadow: none;">
+                            <p style="font-weight: 700; margin-bottom: 8px;">مؤشر المخاطر العام (AI)</p>
+                            <span class="risk-value">12%</span>
+                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: 8px;">طبيعي - لا يوجد تهديد مباشر</p>
+                        </div>
+                        <div class="card" style="border-right: 4px solid var(--warning); background: rgba(245, 158, 11, 0.02); transform: none; box-shadow: none;">
+                            <p style="font-weight: 700; margin-bottom: 8px;">النزاعات المفتوحة</p>
+                            <span class="risk-value" style="color: var(--warning);">5</span>
+                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: 8px;">تحتاج إلى تدخل المشرفين</p>
+                        </div>
+                        <div class="card" style="border-right: 4px solid var(--primary); background: rgba(244, 163, 0, 0.02); transform: none; box-shadow: none;">
+                            <p style="font-weight: 700; margin-bottom: 8px;">أموال في الضمان (Escrow)</p>
+                            <span class="risk-value" style="color: var(--primary);">2.4M</span>
+                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: 8px;">ريال سعودي قيد الحجز</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-content-layout">
+                        <section class="card animate-on-scroll">
+                            <div class="card-header">
+                                <h3 class="card-title">العمليات الحية (Live Operations)</h3>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>معرف العملية</th>
+                                            <th>النوع</th>
+                                            <th>الأطراف</th>
+                                            <th>الحالة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#TR-001</td>
+                                            <td><span class="badge badge-success">حجز معدة</span></td>
+                                            <td>أحمد (ع) - النور (م)</td>
+                                            <td><span class="status-chip">جاري الدفع</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>#TR-002</td>
+                                            <td><span class="badge badge-danger">نزاع</span></td>
+                                            <td>خالد (ع) - السويدي (م)</td>
+                                            <td><span class="status-chip" style="color: var(--danger); border-color: var(--danger);">مفتوح</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>#TR-003</td>
+                                            <td><span class="badge badge-warning">مراجعة AI</span></td>
+                                            <td>إضافة معدة جديدة</td>
+                                            <td><span class="status-chip">مرفوض آلياً (صور سيئة)</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <aside class="card animate-on-scroll" style="background: var(--dark-accent); color: white; border: none; height: fit-content;">
+                            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                                🤖 تنبيهات الذكاء الاصطناعي
+                            </h3>
+                            <div class="flex flex-col gap-4">
+                                <div style="padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px; border-right: 3px solid var(--danger);">
+                                    <strong style="color: #FCA5A5;">احتيال محتمل</strong>
+                                    <p style="font-size: 0.85rem; margin-top: 5px; color: rgba(255,255,255,0.7);">اكتشف النظام نمط حجز متكرر ومشبوه من الحساب #USER-882</p>
+                                </div>
+                                <div style="padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px; border-right: 3px solid var(--warning);">
+                                    <strong style="color: #FCD34D;">تلاعب بالأسعار</strong>
+                                    <p style="font-size: 0.85rem; margin-top: 5px; color: rgba(255,255,255,0.7);">مزود الخدمة "شركة الرواد" قام برفع الأسعار بنسبة 300% فجأة.</p>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary w-full" style="margin-top: 24px;" onclick="navigateTo('ai-config.html')">الانتقال للوحة الـ AI</button>
+                        </aside>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+</body>
+</html>

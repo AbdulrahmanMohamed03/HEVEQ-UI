@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المفاوضات والعروض | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>العروض والمفاوضات</h1>
+                    <p style="color: var(--text-muted);">إدارة عروض الأسعار والمساومات على المعدات</p>
+                </div>
+            </header>
+
+            <div class="card animate-on-scroll">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>السعر الأصلي</th>
+                                <th>عرضك</th>
+                                <th>حالة العرض</th>
+                                <th>آخر تحديث</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <img src="https://images.unsplash.com/photo-1579407569100-33068e64c3c3?auto=format&fit=crop&w=40&q=80" style="width: 40px; height: 40px; border-radius: 8px;">
+                                        <strong>حفار كاتر بيلر 320D</strong>
+                                    </div>
+                                </td>
+                                <td>450,000 ريال</td>
+                                <td style="color: var(--primary); font-weight: 700;">420,000 ريال</td>
+                                <td><span class="badge badge-warning">قيد التفاوض</span></td>
+                                <td>منذ ساعتين</td>
+                                <td>
+                                    <button class="btn btn-outline btn-icon" onclick="navigateTo('messages.html')">💬</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

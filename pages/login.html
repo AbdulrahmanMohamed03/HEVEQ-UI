@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-main) 0%, rgba(244, 163, 0, 0.05) 100%);
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .auth-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .auth-logo span { color: var(--text-main); }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; }
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border-color);
+            background: var(--bg-card);
+            font-family: inherit;
+            transition: 0.3s;
+        }
+        .form-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(244, 163, 0, 0.1); }
+        .auth-footer { text-align: center; margin-top: 25px; font-size: 0.9rem; color: var(--text-muted); }
+        .auth-footer a { color: var(--primary); font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="auth-wrapper">
+        <div class="card auth-card animate-on-scroll">
+            <div class="auth-header">
+                <div class="auth-logo"><span>شير</span>جير</div>
+                <h2>مرحباً بك مجدداً</h2>
+                <p style="color: var(--text-muted);">سجل دخولك للمتابعة في المنصة</p>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني أو رقم الهاتف</label>
+                    <input type="text" class="form-input" placeholder="example@mail.com" required>
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between;">
+                        <label class="form-label">كلمة المرور</label>
+                        <a href="forgot-password.html" style="font-size: 0.8rem; color: var(--primary);">نسيت كلمة المرور؟</a>
+                    </div>
+                    <input type="password" class="form-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px;">تسجيل الدخول</button>
+            </form>
+
+            <div class="auth-footer">
+                ليس لديك حساب؟ <a href="register.html">إنشاء حساب جديد</a>
+            </div>
+        </div>
+    </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const role = sessionStorage.getItem('pendingRole') || 'customer';
+            window.login(role); 
+            window.showToast('تم تسجيل الدخول بنجاح');
+        });
+    </script></body>
+</html>

@@ -1,0 +1,39 @@
+[
+    {
+        "id": 1,
+        "name": "حفار كاتر بيلر 320D",
+        "category": "excavators",
+        "category_ar": "حفارات",
+        "price": 450000,
+        "location": "الرياض",
+        "rating": 4.9,
+        "status": "available",
+        "image": "https://images.unsplash.com/photo-1579407569100-33068e64c3c3?auto=format&fit=crop&w=400&q=80",
+        "description": "حفار قوي وموثوق للأعمال الشاقة."
+    },
+    {
+        "id": 2,
+        "name": "بلدوزر كوماتسو D155AX",
+        "category": "bulldozers",
+        "category_ar": "بلدوزرات",
+        "price": 620000,
+        "location": "الدمام",
+        "rating": 4.8,
+        "status": "available",
+        "image": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=400&q=80",
+        "description": "أداء استثنائي في تسوية الأرض."
+    },
+    {
+        "id": 3,
+        "name": "ونش تادانو 50 طن",
+        "category": "cranes",
+        "category_ar": "أوناش",
+        "price": 850,
+        "unit": "ساعة",
+        "location": "جدة",
+        "rating": 4.7,
+        "status": "available",
+        "image": "https://images.unsplash.com/photo-1541625602330-2277a4c4b282?auto=format&fit=crop&w=400&q=80",
+        "description": "ونش تلسكوبي للأعمال الإنشائية."
+    }
+]

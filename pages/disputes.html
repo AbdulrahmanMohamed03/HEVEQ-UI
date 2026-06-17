@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة النزاعات | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar { background: var(--dark); color: white; border-left: none; }
+        .admin-sidebar .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar .nav-link:hover, .admin-sidebar .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+            <div class="section-title">
+                <h1>مركز النزاعات (Disputes)</h1>
+                <p>مراجعة وحل الخلافات بين العملاء والمزودين</p>
+            </div>
+            <div class="header-actions">
+                <input type="text" class="form-input" placeholder="بحث برقم الحجز..." style="padding: 10px;">
+            </div>
+        </header>
+
+        <div class="card animate-on-scroll">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>رقم النزاع</th>
+                            <th>رقم الحجز</th>
+                            <th>المدعي</th>
+                            <th>المدعى عليه</th>
+                            <th>الأولوية (AI)</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>#DSP-901</strong></td>
+                            <td><a href="#" style="color: var(--primary);">#BK-1002</a></td>
+                            <td>خالد (عميل)</td>
+                            <td>السويدي (مزود)</td>
+                            <td><span class="badge badge-danger">عالية</span></td>
+                            <td><span class="badge badge-warning">قيد المراجعة</span></td>
+                            <td>
+                                <button class="btn btn-primary btn-icon" style="padding: 5px 10px;">حل النزاع ⚖️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>#DSP-900</strong></td>
+                            <td><a href="#" style="color: var(--primary);">#BK-0998</a></td>
+                            <td>النور (مزود)</td>
+                            <td>أحمد (عميل)</td>
+                            <td><span class="badge badge-success">منخفضة</span></td>
+                            <td><span class="badge badge-success">مغلق (لصالح المزود)</span></td>
+                            <td>
+                                <button class="btn btn-outline btn-icon" style="padding: 5px 10px;">عرض السجل 📄</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

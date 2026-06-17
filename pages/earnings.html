@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأرباح والمدفوعات | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .chart-mock { height: 300px; display: flex; align-items: flex-end; gap: 15px; padding: 20px; background: var(--bg-main); border-radius: var(--radius); margin-top: 20px; }
+        .chart-bar { flex: 1; background: var(--primary); border-radius: 8px 8px 0 0; position: relative; }
+        .chart-bar::after { content: attr(data-label); position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <div class="container">
+            <header class="section-header animate-on-scroll">
+                <div class="section-title">
+                    <h1>الأرباح والمدفوعات</h1>
+                    <p style="color: var(--text-muted);">تتبع أرباحك وتاريخ التحويلات البنكية</p>
+                </div>
+                <button class="btn btn-primary">طلب سحب رصيد</button>
+            </header>
+
+            <div class="dashboard-grid animate-on-scroll">
+                <div class="card widget-card">
+                    <div class="widget-info">
+                        <p>الرصيد المتاح للسحب</p>
+                        <h3>45,000 ريال</h3>
+                    </div>
+                    <div class="widget-icon">🏦</div>
+                </div>
+                <div class="card widget-card">
+                    <div class="widget-info">
+                        <p>أرباح قيد الانتظار (Escrow)</p>
+                        <h3>18,400 ريال</h3>
+                    </div>
+                    <div class="widget-icon">⏳</div>
+                </div>
+                <div class="card widget-card">
+                    <div class="widget-info">
+                        <p>إجمالي الأرباح الكلية</p>
+                        <h3>250,000 ريال</h3>
+                    </div>
+                    <div class="widget-icon">📈</div>
+                </div>
+            </div>
+
+            <div class="card animate-on-scroll" style="margin-bottom: 30px;">
+                <h3 class="card-title">إحصائيات الأرباح (آخر 6 أشهر)</h3>
+                <div class="chart-mock">
+                    <div class="chart-bar" style="height: 40%;" data-label="يناير"></div>
+                    <div class="chart-bar" style="height: 60%;" data-label="فبراير"></div>
+                    <div class="chart-bar" style="height: 50%;" data-label="مارس"></div>
+                    <div class="chart-bar" style="height: 80%;" data-label="أبريل"></div>
+                    <div class="chart-bar" style="height: 70%;" data-label="مايو"></div>
+                    <div class="chart-bar" style="height: 90%;" data-label="يونيو"></div>
+                </div>
+            </div>
+
+            <div class="card animate-on-scroll">
+                <h3 class="card-title" style="margin-bottom: 20px;">سجل الدفعات</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الدفعة</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#PAY-9901</td>
+                                <td>1 يونيو 2026</td>
+                                <td>15,000 ريال</td>
+                                <td><span class="badge badge-success">تم التحويل</span></td>
+                                <td><button class="btn btn-outline btn-icon">📄</button></td>
+                            </tr>
+                            <tr>
+                                <td>#PAY-9902</td>
+                                <td>15 مايو 2026</td>
+                                <td>12,400 ريال</td>
+                                <td><span class="badge badge-success">تم التحويل</span></td>
+                                <td><button class="btn btn-outline btn-icon">📄</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>

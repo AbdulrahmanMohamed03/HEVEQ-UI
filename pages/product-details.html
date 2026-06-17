@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل المنتج | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .product-details-grid { display: grid; grid-template-columns: 1fr 450px; gap: 40px; margin-top: 40px; }
+        .product-gallery { position: sticky; top: 100px; height: 500px; border-radius: 24px; overflow: hidden; background: #eee; }
+        .product-gallery img { width: 100%; height: 100%; object-fit: cover; }
+        @media (max-width: 992px) { .product-details-grid { grid-template-columns: 1fr; } .product-gallery { position: static; height: 350px; } }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        <div class="main-content">
+            <app-navbar></app-navbar>
+            <main class="page-content">
+                <div class="container">
+                    <main class="container" style="padding: 40px 0;">
+        <nav style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">
+            <a href="marketplace.html">السوق</a> > <a href="#">معدات مستعملة</a> > حفار كاتر بيلر 320D
+        </nav>
+
+        <div class="product-details-grid">
+            <div class="product-gallery animate-on-scroll">
+                <img src="https://images.unsplash.com/photo-1579407569100-33068e64c3c3?auto=format&fit=crop&w=1200&q=80" alt="Product Image">
+            </div>
+
+            <div class="product-info-panel animate-on-scroll">
+                <div class="card" style="padding: 40px;">
+                    <div class="badge badge-success" style="margin-bottom: 15px;">حالة ممتازة</div>
+                    <h1>حفار كاتر بيلر 320D</h1>
+                    <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px;">موديل 2022 | عدد الساعات: 1,200 ساعة</p>
+                    
+                    <div style="margin-bottom: 40px;">
+                        <span style="font-size: 2.5rem; font-weight: 900; color: var(--primary);">450,000 ريال</span>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">شامل رسوم الفحص والضمان</p>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px;">
+                        <button class="btn btn-primary" style="padding: 18px; font-size: 1.1rem;" onclick="window.navigateTo('purchase-flow.html')">شراء الآن</button>
+                        <button class="btn btn-outline" style="padding: 18px;" onclick="window.navigateTo('offers.html')">تقديم عرض سعر 💰</button>
+                    </div>
+
+                    <div style="padding-top: 30px; border-top: 1px solid var(--border-color);">
+                        <h3>معلومات البائع</h3>
+                        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
+                            <div class="avatar" style="width: 50px; height: 50px;">🏗️</div>
+                            <div>
+                                <strong>شركة النور للمعدات</strong>
+                                <div style="color: #FBBF24; font-size: 0.8rem;">⭐⭐⭐⭐⭐ (4.9)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section style="margin-top: 60px;">
+            <div class="card animate-on-scroll">
+                <h2 style="margin-bottom: 25px;">المواصفات الفنية</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">المحرك</span>
+                        <p><strong>Cat C7.1 ACERT</strong></p>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">الوزن التشغيلي</span>
+                        <p><strong>21,500 كجم</strong></p>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">سعة المغرفة</span>
+                        <p><strong>1.2 متر مكعب</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+                </div>
+            </main>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script></body>
+</html>
