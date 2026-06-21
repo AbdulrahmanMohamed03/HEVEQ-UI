@@ -1,0 +1,115 @@
+{
+  "active_bookings_count": 18,
+  "pending_provider_responses_count": 7,
+  "listings_pending_review_count": 14,
+  "open_disputes_count": 5,
+  "disputes_priority_breakdown": {
+    "high": 2,
+    "medium": 2,
+    "low": 1
+  },
+  "sla_breach_alerts": [
+    {
+      "type": "provider_response",
+      "booking_id": "BK-1234",
+      "provider_name": "الرواد للمقاولات",
+      "elapsed_minutes": 240,
+      "limit_minutes": 120,
+      "message": "تأخر الاستجابة من المزود لأكثر من ساعتين لحجز الونش 50 طن"
+    },
+    {
+      "type": "ticket_response",
+      "ticket_id": "TCK-5510",
+      "subject": "شكوى عدم تشغيل المولد",
+      "deadline": "2026-06-21T12:00:00Z",
+      "message": "تجاوزت التذكرة المهلة المحددة للرد من قبل الإدارة (SLA Breach)"
+    }
+  ],
+  "ai_events": [
+    {
+      "id": "EVT-8801",
+      "agent_type": "Moderator",
+      "entity_type": "ServiceListing",
+      "ai_recommendation": "Reject (Flagged Content)",
+      "latency_ms": 320,
+      "created_at": "منذ 3 دقائق",
+      "description": "تم فحص وصف الخدمة لـ 'تأجير رافعة شوكية' وتحديد وجود كلمات مشبوهة."
+    },
+    {
+      "id": "EVT-8802",
+      "agent_type": "Vision",
+      "entity_type": "JobCompletionEvidence",
+      "ai_recommendation": "Approve (High Similarity 94%)",
+      "latency_ms": 780,
+      "created_at": "منذ 15 دقيقة",
+      "description": "تم فحص صور إثبات التنفيذ لمطابقة الموقع والعدادات بنجاح."
+    },
+    {
+      "id": "EVT-8803",
+      "agent_type": "Search",
+      "entity_type": "SearchQueryLogs",
+      "ai_recommendation": "Intent Extracted: Heavy Crane",
+      "latency_ms": 95,
+      "created_at": "منذ 28 دقيقة",
+      "description": "تمت معالجة استعلام بحث دلالي دقيق بنجاح."
+    }
+  ],
+  "live_operations": [
+    {
+      "booking_id": "BK-2201",
+      "customer": "خالد القحطاني",
+      "provider": "مؤسسة النخبة للمعدات",
+      "status": "InProgress",
+      "status_ar": "قيد التنفيذ",
+      "sla_state": "normal",
+      "sla_state_ar": "سليم",
+      "amount": 4500
+    },
+    {
+      "booking_id": "BK-2202",
+      "customer": "شركة العليان للمقاولات",
+      "provider": "مجموعة الفوزان",
+      "status": "PendingProviderResponse",
+      "status_ar": "معلق استجابة المزود",
+      "sla_state": "warning",
+      "sla_state_ar": "تحذير SLA (متبقي 15 دقيقة)",
+      "amount": 12000
+    },
+    {
+      "booking_id": "BK-2203",
+      "customer": "صالح الحربي",
+      "provider": "الجنادرية للآليات",
+      "status": "Disputed",
+      "status_ar": "متنازع عليه",
+      "sla_state": "danger",
+      "sla_state_ar": "متجاوز SLA التذكرة",
+      "amount": 3500
+    },
+    {
+      "booking_id": "BK-2204",
+      "customer": "فهد السديري",
+      "provider": "السويدي للخدمات الصناعية",
+      "status": "PendingFieldVerification",
+      "status_ar": "قيد التحقق الميداني",
+      "sla_state": "normal",
+      "sla_state_ar": "سليم",
+      "amount": 8000
+    }
+  ],
+  "pending_provider_responses": [
+    {
+      "booking_id": "BK-2202",
+      "service_name": "جرافة كاتربيلر D9",
+      "provider_name": "مجموعة الفوزان",
+      "elapsed_minutes": 105,
+      "created_at": "2026-06-21T14:45:00Z"
+    },
+    {
+      "booking_id": "BK-2205",
+      "service_name": "ونش تلسكوبي 100 طن",
+      "provider_name": "اليسر للآليات",
+      "elapsed_minutes": 42,
+      "created_at": "2026-06-21T15:30:00Z"
+    }
+  ]
+}

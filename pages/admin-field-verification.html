@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحقق الميداني والزيارات | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .dispatch-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: var(--s5);
+        }
+        @media(max-width: 992px) {
+            .dispatch-layout { grid-template-columns: 1fr; }
+        }
+
+        .gallery {
+            display: flex;
+            gap: var(--s3);
+            flex-wrap: wrap;
+            margin-top: var(--s3);
+        }
+        .gallery img {
+            width: 80px; height: 80px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--bg-card);
+            padding: var(--s6);
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>التحقق الميداني وإرسال الموظفين (Field Verification Operations)</h1>
+                            <p>تكليف الموظفين الميدانيين بالزيارات، ومراجعة تقارير فحص المعدات ومطابقة صور العدادات واللوحات بالذكاء الاصطناعي</p>
+                        </div>
+                    </header>
+
+                    <div class="dispatch-layout animate-on-scroll">
+                        <!-- Dispatch Form -->
+                        <div class="card" style="height:fit-content;">
+                            <h3 style="margin-bottom: var(--s4);">تكليف موظف ميداني ⚡</h3>
+                            <form id="dispatch-form">
+                                <div class="form-group">
+                                    <label class="form-label">رقم الحجز المستهدف</label>
+                                    <input type="text" class="form-input" id="disp-booking-id" placeholder="مثال: BK-1002" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">الموظف الميداني المتاح</label>
+                                    <select class="form-input" id="disp-employee" required>
+                                        <option value="">جاري تحميل الموظفين المتاحين...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label font-bold text-danger">استمارة الإثبات المرتبطة</label>
+                                    <input type="text" class="form-input" id="disp-evidence-id" placeholder="مثال: EV-3301" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">تعليمات الإرسال الميدانية</label>
+                                    <textarea class="form-input" id="disp-instructions" rows="4" placeholder="اكتب وصفاً دقيقاً للموقع والمطلوب التحقق منه..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">إرسال وتكليف الموظف الميداني ✈️</button>
+                            </form>
+                        </div>
+
+                        <!-- Verification Forms Queue -->
+                        <div class="card">
+                            <h3 style="margin-bottom: var(--s4);">طلبات وفحوصات التحقق القائمة</h3>
+                            <div id="verification-list-container" style="display:flex; flex-direction:column; gap: var(--s4);">
+                                <div style="text-align:center; padding: 20px;">جاري التحميل...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Admin Decision Modal -->
+    <div class="modal" id="decision-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: var(--s3); color: var(--primary);">اعتماد قرار تسوية الحساب (Escrow Affecting)</h3>
+            <div style="background:rgba(245, 158, 11, 0.05); border:1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius:8px; margin-bottom:15px; font-size:var(--text-xs);">
+                ⚠️ <strong>تنبيه مالي هام:</strong> هذا القرار نهائي وسيقوم فوراً بتوزيع المبالغ المحتجزة في الضمان المالي (Escrow) لصالح العميل أو المزود وفق القواعد القانونية.
+            </div>
+            
+            <form id="decision-form">
+                <input type="hidden" id="dec-form-id">
+                <div class="form-group">
+                    <label class="form-label">القرار الإداري</label>
+                    <select class="form-input" id="dec-action" required>
+                        <option value="1">تحرير كامل الأموال للمزود (ReleaseToProvider)</option>
+                        <option value="2">إرجاع كامل الأموال للمستأجر (RefundToCustomer)</option>
+                        <option value="3">تسوية مالية جزئية للطرفين (PartialSettlement)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ملاحظة القرار الإداري لتبرير الصرف</label>
+                    <textarea class="form-input" id="dec-note" rows="3" placeholder="اكتب مبررات الصرف وسند المطابقة الميداني..." required></textarea>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="closeDecisionModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" style="background:var(--success); box-shadow:none;">حفظ واعتماد ⚖️</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let verificationData = [];
+        let employeesData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get query params if page was navigated to from tickets link
+            const urlParams = new URLSearchParams(window.location.search);
+            const bId = urlParams.get('booking_id') || '';
+            const eId = urlParams.get('evidence_form_id') || '';
+            
+            if (bId) {
+                document.getElementById('disp-booking-id').value = bId;
+            }
+            if (eId) {
+                document.getElementById('disp-evidence-id').value = eId;
+            }
+
+            await loadData();
+        });
+
+        async function loadData() {
+            try {
+                const data = await window.API.getAdminFieldVerification();
+                verificationData = data.field_verifications;
+                employeesData = data.available_employees;
+                
+                renderEmployeesSelect();
+                renderVerificationList();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل بيانات التحقق الميداني', 'danger');
+            }
+        }
+
+        function renderEmployeesSelect() {
+            const select = document.getElementById('disp-employee');
+            select.innerHTML = '<option value="">اختر الموظف الميداني...</option>';
+            
+            const activeEmployees = employeesData.filter(emp => emp.is_available_for_dispatch === true);
+            
+            if (activeEmployees.length > 0) {
+                activeEmployees.forEach(emp => {
+                    const opt = document.createElement('option');
+                    opt.value = emp.id;
+                    opt.innerText = `${emp.first_name} ${emp.last_name} (${emp.assigned_governorate} - ${emp.employee_code})`;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = '<option value="">لا يوجد موظفين متاحين للتحقق حالياً</option>';
+            }
+        }
+
+        function renderVerificationList() {
+            const container = document.getElementById('verification-list-container');
+            container.innerHTML = '';
+
+            if (verificationData.length > 0) {
+                verificationData.forEach(fv => {
+                    const item = document.createElement('div');
+                    item.className = 'card';
+                    item.style.cssText = 'border-right: 4px solid var(--primary); padding: var(--s4); box-shadow: none;';
+                    
+                    let visitBadgeColor = 'badge-info';
+                    if (fv.visit_status === 2) visitBadgeColor = 'badge-success'; // Completed
+                    if (fv.visit_status === 3) visitBadgeColor = 'badge-danger'; // FailedAccess
+                    if (fv.visit_status === 0) visitBadgeColor = 'badge-warning'; // Dispatched
+                    
+                    // Decided status
+                    let decBadge = 'badge-info';
+                    if (fv.admin_decision !== 0) decBadge = 'badge-success';
+
+                    // Similarity gauge
+                    const similarityStr = fv.ai_similarity_score !== null 
+                        ? `${(fv.ai_similarity_score * 100).toFixed(1)}%` 
+                        : 'معلق بالزيارة';
+
+                    // Enforce UI Rule: Admin decision only enabled if Completed (2) and AiSimilarityScore exists
+                    const decisionEligible = fv.visit_status === 2 && fv.ai_similarity_score !== null;
+
+                    item.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:5px; margin-bottom:10px;">
+                            <div>
+                                <strong>طلب رقم: #${fv.id}</strong> | للحجز: <strong>${fv.booking_id}</strong>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <span class="badge ${visitBadgeColor}">الزيارة: ${fv.visit_status_ar}</span>
+                                <span class="badge ${decBadge}">القرار المالي: ${fv.admin_decision_ar}</span>
+                            </div>
+                        </div>
+
+                        <div style="font-size:var(--text-xs); line-height:1.5; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div><strong>الموظف المكلف:</strong> ${fv.dispatched_employee_name}</div>
+                            <div><strong>المرسل (المدير):</strong> ${fv.dispatched_by_admin_name}</div>
+                            <div><strong>أول عمل ميداني:</strong> ${new Date(fv.dispatched_at).toLocaleString('ar-SA')}</div>
+                            <div><strong>مستند الإثبات:</strong> #${fv.linked_evidence_form_id}</div>
+                        </div>
+
+                        <div style="margin-top:10px; background:var(--bg-main); padding:10px; border-radius:6px; font-size:var(--text-xs);">
+                            <strong>📋 تعليمات التكليف:</strong>
+                            <p style="color:var(--text-muted); margin-top:2px;">${fv.dispatch_instructions}</p>
+                        </div>
+
+                        <div style="margin-top:10px; font-size:var(--text-xs);">
+                            <div><strong>مقارنة الذكاء الاصطناعي البصرية (AI Similarity):</strong> <strong style="color:var(--primary);">${similarityStr}</strong></div>
+                            <div style="color:var(--text-muted); margin-top:2px;">${fv.ai_similarity_notes}</div>
+                        </div>
+
+                        ${fv.photos && fv.photos.length > 0 ? `
+                            <div class="gallery">
+                                ${fv.photos.map(ph => `<img src="${ph.photo_url}" alt="${ph.caption}" title="${ph.caption}" onclick="window.showToast('${ph.caption}')">`).join('')}
+                            </div>
+                        ` : ''}
+
+                        <div style="margin-top:15px; border-top: 1px dashed var(--border-color); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:var(--text-xs); color:var(--text-muted);">
+                                ${!decisionEligible ? '🔒 القرار مقفل لحين استكمال التقرير والـ AI' : '✓ مستند للقرار وصرف الضمان'}
+                            </span>
+                            ${fv.admin_decision === 0 ? `
+                                <button class="btn btn-primary" style="padding:4px 12px; font-size:var(--text-xs);" ${!decisionEligible ? 'disabled' : ''} onclick="openDecisionModal('${fv.id}')">
+                                    اتخاذ القرار المالي والتسوية ⚖️
+                                </button>
+                            ` : `
+                                <div style="font-size:var(--text-xs);"><strong>قرار المدير:</strong> ${fv.admin_decision_note}</div>
+                            `}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } else {
+                container.innerHTML = '<div style="text-align:center; padding:20px;">لا يوجد طلبات تحقق حالياً</div>';
+            }
+        }
+
+        document.getElementById('dispatch-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const bId = document.getElementById('disp-booking-id').value;
+            const empId = document.getElementById('disp-employee').value;
+            const empName = document.getElementById('disp-employee').options[document.getElementById('disp-employee').selectedIndex].text.split(' (')[0];
+            const evId = document.getElementById('disp-evidence-id').value;
+            const inst = document.getElementById('disp-instructions').value;
+
+            const newFv = {
+                "id": "FV-" + (7700 + verificationData.length + 1),
+                "booking_id": bId,
+                "dispatched_employee_id": empId,
+                "dispatched_employee_name": empName,
+                "dispatched_by_admin_id": "USR-0003",
+                "dispatched_by_admin_name": "عبد الرحمن الرشيد",
+                "linked_evidence_form_id": evId,
+                "dispatch_instructions": inst,
+                "visit_status": 0,
+                "visit_status_ar": "تم التكليف (Dispatched)",
+                "visit_status_name": "Dispatched",
+                "outcome": null,
+                "outcome_ar": "انتظار الزيارة",
+                "outcome_name": "Pending",
+                "ai_similarity_score": null,
+                "ai_similarity_notes": "لا يوجد نتائج بعد (انتظار اكتمال الزيارة)",
+                "admin_decision": 0,
+                "admin_decision_ar": "معلق القرار (Pending)",
+                "admin_decision_name": "Pending",
+                "admin_decision_note": "",
+                "photos": [],
+                "dispatched_at": new Date().toISOString(),
+                "visited_at": null
+            };
+
+            verificationData.unshift(newFv);
+            
+            window.showToast('تم تكليف الموظف وإرسال التنبيه له عبر الهاتف.');
+            renderVerificationList();
+
+            // Clear inputs
+            document.getElementById('disp-booking-id').value = '';
+            document.getElementById('disp-evidence-id').value = '';
+            document.getElementById('disp-instructions').value = '';
+            document.getElementById('disp-employee').value = '';
+        });
+
+        function openDecisionModal(id) {
+            document.getElementById('dec-form-id').value = id;
+            document.getElementById('dec-note').value = '';
+            document.getElementById('decision-modal').classList.add('show');
+        }
+
+        function closeDecisionModal() {
+            document.getElementById('decision-modal').classList.remove('show');
+        }
+
+        document.getElementById('decision-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('dec-form-id').value;
+            const action = parseInt(document.getElementById('dec-action').value);
+            const note = document.getElementById('dec-note').value;
+            
+            const fv = verificationData.find(f => f.id === id);
+            if (!fv) return;
+
+            fv.admin_decision = action;
+            const decisionsAr = ["", "تحرير للمزود (ReleaseToProvider)", "إرجاع للعميل (RefundToCustomer)", "تسوية جزئية (PartialSettlement)"];
+            fv.admin_decision_ar = decisionsAr[action];
+            fv.admin_decision_note = note;
+
+            window.showToast('تم اعتماد القرار المالي وتسوية حساب الضمان بنجاح.');
+            renderVerificationList();
+            closeDecisionModal();
+        });
+    </script>
+</body>
+</html>

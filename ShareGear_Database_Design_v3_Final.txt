@@ -1,0 +1,2511 @@
+ShareGear - Final Database Design v3.0
+Final merged schema after v2.0 tickets/forms update and agreed gap decisions
+1. Purpose
+This document is the final database design for ShareGear after applying the agreed database gap decisions to Database Design v2.0. The v2.0 database is used as the base because it already replaced Complaints with Tickets, added TicketMessages and TicketAttachments, added EmployeeProfiles, and added the Job Completion and Field Verification evidence forms.
+2. Final Scope Rules
+Apply every agreed GAP marked as apply in full unless an explicit exception was documented.
+Keep the v2 ticket system and the two evidence form workflows.
+Do not include removed or rejected objects in the final logical schema.
+Migration scripts may temporarily keep deprecated columns only for backfill. The final logical schema reflects the target state.
+3. Final Table Count
+Final target schema contains 41 tables.
+4. Removed / Not Applied Items
+Item
+Final Decision
+Offers table
+Removed by GAP-017. Offer negotiation is not part of the final SQL schema.
+AuditLogs table
+Removed by GAP-026. SQL table is not included in the final schema.
+Complaints table
+Already removed in v2 and replaced by Tickets.
+Bookings.IsPriorityBooking
+Removed by GAP-003 decision.
+Priority admin acknowledgment gate
+Not applied. Do not add PrioritySurchargeRate, PriorityAcknowledgedAt, PriorityAcknowledgedByAdminId, or PendingAdminPriorityAck.
+Emergency override fields
+Not added under GAP-001: IsEmergencyCancellation, EmergencyOverrideStatus, EmergencyOverrideAdminId, EmergencyOverrideDecidedAt.
+Customer holdout fields
+GAP-006 not applied. Do not add CustomerHoldoutElected or ExtendedProviderDeadline.
+UserChatViolations table and Messages.ViolationType
+GAP-013 not applied. Keep old chat-blocking design without this table.
+ServiceListings.AvailabilityHours
+Replaced by ServiceListingAvailability after migration/backfill.
+Messages.IsRead and Messages.ReadAt
+Replaced by ConversationReadReceipts. Can remain temporarily during migration only as denormalized cache.
+5. Final Entity List
+#
+Table
+Status
+Purpose
+1
+Users
+Modified
+Core identity. Role enum includes Employee=3.
+2
+RefreshTokens
+Unchanged
+JWT refresh token store.
+3
+Addresses
+Unchanged
+Saved user addresses.
+4
+ProviderProfiles
+Modified
+Provider profile, geo-zone, cached metrics, trust score.
+5
+CustomerProfiles
+New
+Customer trust score and premium verification gate.
+6
+CustomerTrustScoreHistory
+New
+Customer trust trend history.
+7
+EmployeeProfiles
+Existing v2
+ShareGear CS and field employee profile.
+8
+Operators
+Unchanged
+Provider operators.
+9
+Categories
+Unchanged
+Service and marketplace taxonomy.
+10
+ServiceListings
+Modified
+Listing data, AI moderation, Qdrant sync, structured quality score.
+11
+ServiceListingPhotos
+Unchanged
+Service listing photos.
+12
+ServiceListingOperators
+Unchanged
+Operators per listing.
+13
+ServiceListingAvailability
+New
+Structured operational hours by day of week.
+14
+BlackoutDates
+Modified
+Listing and optional operator blackout dates.
+15
+Documents
+Unchanged
+Uploaded verification documents and OCR results.
+16
+Bookings
+Modified
+Booking lifecycle, surcharge decomposition, cancellation, reassignment and concurrency.
+17
+BookingTimeAdjustmentRequests
+New
+Provider time-adjustment workflow.
+18
+OperatorAssignments
+Indexed
+Operator scheduling and conflict checks.
+19
+EscrowRecords
+Modified
+Escrow state machine with commission snapshot and rowversion.
+20
+MarketplaceListings
+Modified
+Marketplace listing with Qdrant sync and admin rejection metadata.
+21
+MarketplaceListingPhotos
+Unchanged
+Marketplace listing photos.
+22
+MarketplaceOrders
+Modified
+Defined marketplace order statuses and cancellation fields.
+23
+Reviews
+Modified
+Direct listing references for AI authenticity checks.
+24
+Tickets
+Modified v2
+Customer service ticket system with dispute SLA tracking.
+25
+TicketMessages
+Existing v2
+Threaded ticket messages.
+26
+TicketAttachments
+Existing v2
+Per-message ticket attachments.
+27
+JobCompletionEvidenceForms
+Existing v2
+Provider completion evidence form.
+28
+JobCompletionEvidencePhotos
+Existing v2
+Provider completion evidence photos.
+29
+FieldVerificationForms
+Existing v2
+Employee field verification form.
+30
+FieldVerificationPhotos
+Existing v2
+Employee field verification photos.
+31
+Conversations
+Unchanged
+Chat thread header.
+32
+Messages
+Modified
+Messages without per-row read state. Read state moved to ConversationReadReceipts.
+33
+ConversationReadReceipts
+New
+Per-user per-conversation read state.
+34
+Notifications
+Indexed
+User notification inbox.
+35
+ProviderIncidents
+Unchanged
+Provider incident log.
+36
+PlatformSettings
+Seeded
+Platform configuration including new policy keys.
+37
+SearchQueryLogs
+New
+Search analytics and alternative acceptance tracking.
+38
+DomainEventQueue
+New
+Durable background event queue for Qdrant and listing quality tasks.
+39
+ProviderTrustScoreHistory
+New
+Provider trust trend history.
+40
+CategoryPricingAggregates
+New
+Cached price aggregates for pricing advisory.
+41
+AiInteractionLogs
+New
+AI invocation and admin override audit for AI decisions.
+6. Core Enums
+UserRole
+public enum UserRole{    Customer = 0,    Provider = 1,    Admin = 2,    Employee = 3}
+BookingStatus
+public enum BookingStatus{    Draft = 0,    PendingProviderResponse = 1,    ConfirmedPendingPayment = 2,    Active = 3,    InProgress = 4,    PendingCustomerConfirmation = 5,    Completed = 6,    Disputed = 7,    Rejected = 8,    ProviderUnresponsive = 9,    Reassigned = 10,    CancelledRefunded = 11,    ResolvedReleased = 12,    ResolvedRefunded = 13,    PendingFieldVerification = 14,    FieldVerificationComplete = 15}
+EvidenceFormStatus
+public enum EvidenceFormStatus{    Draft = 0,    Submitted = 1,    UnderAdminReview = 2,    AcceptedAsEvidence = 3,    RejectedAsEvidence = 4}
+VisitStatus
+public enum VisitStatus{    Dispatched = 0,    OnSite = 1,    Completed = 2,    FailedAccess = 3}
+FieldVerificationOutcome
+public enum FieldVerificationOutcome{    JobConfirmed = 0,    JobNotConfirmed = 1,    PartiallyConfirmed = 2,    Inconclusive = 3}
+FieldVerificationAdminDecision
+public enum FieldVerificationAdminDecision{    Pending = 0,    ReleaseToProvider = 1,    RefundToCustomer = 2,    PartialSettlement = 3}
+TicketStatus
+public enum TicketStatus{    Open = 0,    InProgress = 1,    PendingCustomerReply = 2,    PendingProviderReply = 3,    PendingFieldVerification = 4,    Resolved = 5,    Closed = 6,    Reopened = 7}
+TicketCategory
+public enum TicketCategory{    ServiceQuality = 0,    OperatorConduct = 1,    PaymentIssue = 2,    Fraud = 3,    SafetyConcern = 4,    CompletionDispute = 5,    MarketplaceIssue = 6,    Other = 7}
+TicketResolutionType
+public enum TicketResolutionType{    FullRefundToCustomer = 0,    FullReleaseToProvider = 1,    PartialSettlement = 2,    ServiceRedo = 3,    NoActionRequired = 4,    EscalatedToFieldVerification = 5}
+MarketplaceOrderStatus
+public enum MarketplaceOrderStatus{    PendingPayment = 0,    PaymentCaptured = 1,    SellerConfirmed = 2,    Dispatched = 3,    Delivered = 4,    Completed = 5,    Disputed = 6,    CancelledPreDispatch = 7,    CancelledPostDispatch = 8,    Refunded = 9}
+7. Final Table Definitions
+1. Users
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK. ASP.NET Core Identity user id
+Email
+nvarchar(256)
+YES
+Unique identity email when provided
+PhoneNumber
+nvarchar(50)
+YES
+Phone verification source
+PasswordHash
+nvarchar(max)
+YES
+Identity password hash
+FirstName
+nvarchar(100)
+NO
+User first name
+LastName
+nvarchar(100)
+NO
+User last name
+Role
+int
+NO
+0=Customer, 1=Provider, 2=Admin, 3=Employee
+IsPhoneVerified
+bit
+NO
+Default 0
+IsEmailVerified
+bit
+NO
+Default 0
+IsActive
+bit
+NO
+Soft suspension flag, no physical delete
+FcmToken
+nvarchar(500)
+YES
+Firebase Cloud Messaging token
+CreatedAt
+datetime2
+NO
+UTC
+UpdatedAt
+datetime2
+NO
+UTC
+2. RefreshTokens
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+NO
+FK -> Users.Id
+Token
+nvarchar(500)
+NO
+Store hashed token value
+ExpiresAt
+datetime2
+NO
+Refresh expiry
+IsRevoked
+bit
+NO
+Default 0
+CreatedAt
+datetime2
+NO
+UTC
+3. Addresses
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+NO
+FK -> Users.Id
+Label
+nvarchar(100)
+YES
+User friendly label
+Governorate
+nvarchar(100)
+NO
+Address governorate
+District
+nvarchar(100)
+NO
+Address district
+Street
+nvarchar(300)
+YES
+Street details
+Latitude
+decimal(10,7)
+YES
+Geocoded latitude
+Longitude
+decimal(10,7)
+YES
+Geocoded longitude
+IsDefault
+bit
+NO
+Application enforces single default
+CreatedAt
+datetime2
+NO
+UTC
+4. ProviderProfiles
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+NO
+FK -> Users.Id, unique
+CompanyName
+nvarchar(200)
+NO
+Provider display name
+BusinessDescription
+nvarchar(max)
+YES
+Business summary
+BaseLatitude
+decimal(10,7)
+YES
+Legacy coordinate retained for compatibility
+BaseLongitude
+decimal(10,7)
+YES
+Legacy coordinate retained for compatibility
+ServiceRadiusKm
+int
+NO
+Radius for circular service-zone fallback
+ServiceZoneCenter
+geography
+YES
+GAP-005. POINT(BaseLng BaseLat). Spatial indexed
+ServiceZonePoly
+geography
+YES
+GAP-005. Optional polygon service zone
+OnboardingTier
+int
+NO
+0-3 provider tier
+AverageRating
+decimal(5,2)
+NO
+Cached metric
+TotalReviewsCount
+int
+NO
+Cached metric
+CompletedBookingsCount
+int
+NO
+Cached metric
+ResponseRate
+decimal(5,4)
+NO
+Cached metric
+SearchRankingModifier
+decimal(5,4)
+NO
+Ranking multiplier
+TrustScore
+decimal(5,2)
+NO
+GAP-010. Stored 0-100 provider trust score
+TrustLevel
+int
+NO
+GAP-010. 0=AtRisk, 1=Standard, 2=Verified, 3=TopProvider
+TrustScoreLastComputedAt
+datetime2
+YES
+GAP-010
+CreatedAt
+datetime2
+NO
+UTC
+UpdatedAt
+datetime2
+NO
+UTC
+5. CustomerProfiles
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+NO
+FK -> Users.Id, unique
+TrustScore
+decimal(5,2)
+NO
+GAP-009. Default 100.00
+CancellationRate
+decimal(5,4)
+YES
+Trust-score component
+DisputeFrequencyScore
+decimal(5,2)
+YES
+Trust-score component
+PaymentFailureCount
+int
+NO
+Default 0
+ReviewAuthenticityScore
+decimal(5,2)
+YES
+Trust-score component
+RequiresAdditionalVerification
+bit
+NO
+Premium booking gate
+TotalBookings
+int
+NO
+Cached count
+TrustScoreLastComputedAt
+datetime2
+YES
+Last calculation time
+CreatedAt
+datetime2
+NO
+UTC
+UpdatedAt
+datetime2
+NO
+UTC
+6. CustomerTrustScoreHistory
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+CustomerProfileId
+uniqueidentifier
+NO
+FK -> CustomerProfiles.Id
+TrustScore
+decimal(5,2)
+NO
+Snapshot score
+TriggerEvent
+nvarchar(50)
+YES
+Example: BookingCancelled, DisputeOpened
+RecordedAt
+datetime2
+NO
+UTC
+7. EmployeeProfiles
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+NO
+FK -> Users.Id, unique
+EmployeeCode
+nvarchar(20)
+NO
+Unique, human readable
+Department
+nvarchar(100)
+YES
+Customer Service, Field Operations, Operations
+AssignedGovernorate
+nvarchar(100)
+YES
+Primary dispatch governorate
+IsAvailableForDispatch
+bit
+NO
+true = eligible for field verification dispatch
+TotalVerificationsCompleted
+int
+NO
+Cached count
+TotalTicketsHandled
+int
+NO
+Cached count
+CreatedAt
+datetime2
+NO
+UTC
+UpdatedAt
+datetime2
+NO
+UTC
+8. Operators
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ProviderProfileId
+uniqueidentifier
+NO
+FK -> ProviderProfiles.Id
+FullName
+nvarchar(200)
+NO
+Operator name
+YearsOfExperience
+int
+YES
+Experience years
+Specialization
+nvarchar(200)
+YES
+Equipment specialization
+LicenseType
+nvarchar(100)
+YES
+License type
+LicenseNumber
+nvarchar(100)
+YES
+License number
+LicenseExpiryDate
+date
+YES
+OCR and expiry checks
+ProfilePhotoUrl
+nvarchar(500)
+YES
+Blob URL
+IsActive
+bit
+NO
+Default 1
+CreatedAt
+datetime2
+NO
+UTC
+9. Categories
+Column
+Type
+Nullable
+Notes
+Id
+int
+NO
+PK
+Name
+nvarchar(200)
+NO
+Category display name
+Slug
+nvarchar(200)
+NO
+Unique slug
+Type
+int
+NO
+0=Service, 1=Marketplace
+ParentId
+int
+YES
+Self FK -> Categories.Id
+10. ServiceListings
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ProviderProfileId
+uniqueidentifier
+NO
+FK -> ProviderProfiles.Id
+CategoryId
+int
+NO
+FK -> Categories.Id
+Title
+nvarchar(200)
+NO
+Listing title
+Description
+nvarchar(max)
+NO
+Listing description
+Tags
+nvarchar(500)
+YES
+Search tags
+EquipmentModel
+nvarchar(200)
+YES
+Equipment model
+EquipmentCapacity
+nvarchar(100)
+YES
+Capacity specification
+EquipmentCondition
+int
+YES
+Condition enum
+YearOfManufacture
+int
+YES
+Manufacture year
+EquipmentRegistrationNumber
+nvarchar(100)
+YES
+Registration number
+HourlyRate
+decimal(10,2)
+YES
+Hourly price
+DailyRate
+decimal(10,2)
+YES
+Daily price
+MinimumBookingHours
+int
+NO
+Minimum duration
+Status
+int
+NO
+Service listing status enum
+AiRiskScore
+int
+YES
+AI moderation output
+AiRiskLevel
+nvarchar(50)
+YES
+AI moderation output
+AiRiskFlags
+nvarchar(max)
+YES
+AI risk flags JSON
+AiRecommendation
+nvarchar(100)
+YES
+AI recommendation
+QualityScore
+int
+YES
+Final quality score
+QdrantPointId
+nvarchar(100)
+YES
+GAP-008. Durable vector index id
+LastEmbeddedAt
+datetime2
+YES
+GAP-008
+EmbeddingStatus
+int
+NO
+GAP-008. 0=Pending,1=Synced,2=Failed,3=DeletePending
+AdminRejectionNote
+nvarchar(500)
+YES
+GAP-011. Human admin note
+RejectedByAdminId
+uniqueidentifier
+YES
+FK -> Users.Id
+RejectedAt
+datetime2
+YES
+Admin rejection time
+SubmissionCount
+int
+NO
+GAP-011. Default 1
+QsDescription
+int
+YES
+GAP-032 quality component
+QsPhotos
+int
+YES
+GAP-032 quality component
+QsSpecs
+int
+YES
+GAP-032 quality component
+QsPricing
+int
+YES
+GAP-032 quality component
+QsOperator
+int
+YES
+GAP-032 quality component
+QsDocs
+int
+YES
+GAP-032 quality component
+QsZone
+int
+YES
+GAP-032 quality component
+QualityScoreComputedAt
+datetime2
+YES
+GAP-032
+CreatedAt
+datetime2
+NO
+UTC
+UpdatedAt
+datetime2
+NO
+UTC
+11. ServiceListingPhotos
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ListingId
+uniqueidentifier
+NO
+FK -> ServiceListings.Id
+PhotoUrl
+nvarchar(500)
+NO
+Blob URL
+DisplayOrder
+int
+NO
+Ordering
+CreatedAt
+datetime2
+NO
+UTC
+12. ServiceListingOperators
+Column
+Type
+Nullable
+Notes
+ListingId
+uniqueidentifier
+NO
+Composite PK, FK -> ServiceListings.Id
+OperatorId
+uniqueidentifier
+NO
+Composite PK, FK -> Operators.Id
+13. ServiceListingAvailability
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ListingId
+uniqueidentifier
+NO
+FK -> ServiceListings.Id
+DayOfWeek
+int
+NO
+0=Sunday through 6=Saturday
+OpenTime
+time
+NO
+Open time
+CloseTime
+time
+NO
+Close time
+14. BlackoutDates
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ListingId
+uniqueidentifier
+NO
+FK -> ServiceListings.Id
+OperatorId
+uniqueidentifier
+YES
+GAP-014. Optional FK -> Operators.Id
+Date
+date
+NO
+Blackout date
+Reason
+nvarchar(300)
+YES
+Reason
+CreatedAt
+datetime2
+NO
+UTC
+15. Documents
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+YES
+FK -> Users.Id
+ServiceListingId
+uniqueidentifier
+YES
+FK -> ServiceListings.Id
+MarketplaceListingId
+uniqueidentifier
+YES
+FK -> MarketplaceListings.Id
+OperatorId
+uniqueidentifier
+YES
+FK -> Operators.Id
+DocumentType
+int
+NO
+Document enum
+FileUrl
+nvarchar(500)
+NO
+Blob URL
+Status
+int
+NO
+Document verification status
+ExtractedText
+nvarchar(max)
+YES
+OCR output
+ConfidenceScore
+decimal(5,4)
+YES
+OCR confidence
+KeyFieldsPresent
+bit
+YES
+OCR validation result
+ExpiryDate
+date
+YES
+Document expiry
+ExpiryStatus
+int
+YES
+Expiry enum
+FailureReason
+nvarchar(500)
+YES
+Failure details
+UploadedAt
+datetime2
+NO
+UTC
+VerifiedAt
+datetime2
+YES
+UTC
+16. Bookings
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+CustomerId
+uniqueidentifier
+NO
+FK -> Users.Id
+ServiceListingId
+uniqueidentifier
+NO
+FK -> ServiceListings.Id
+AssignedOperatorId
+uniqueidentifier
+YES
+FK -> Operators.Id
+JobTitle
+nvarchar(200)
+NO
+Customer job title
+JobDescription
+nvarchar(max)
+YES
+Customer job details
+Governorate
+nvarchar(100)
+NO
+Service location
+District
+nvarchar(100)
+NO
+Service location
+Street
+nvarchar(300)
+YES
+Service location
+Latitude
+decimal(10,7)
+YES
+Legacy lat/lng
+Longitude
+decimal(10,7)
+YES
+Legacy lat/lng
+ServiceLocationGeo
+geography
+YES
+GAP-005. POINT(Lng Lat)
+SiteContactName
+nvarchar(200)
+YES
+On-site contact
+SiteContactPhone
+nvarchar(50)
+YES
+On-site phone
+AccessRequirements
+nvarchar(1000)
+YES
+Site access details
+SafetyNotes
+nvarchar(1000)
+YES
+Safety notes
+RequestedStartDate
+date
+NO
+Requested date
+RequestedStartTime
+time
+NO
+Requested start time
+EstimatedDurationHours
+decimal(5,2)
+NO
+Original estimate
+ActualDurationHours
+decimal(5,2)
+YES
+Actual duration
+HourlyRateSnapshot
+decimal(10,2)
+NO
+Rate at booking time
+EstimatedTotal
+decimal(10,2)
+NO
+Estimated amount
+SurchargeAmount
+decimal(10,2)
+YES
+Retained as computed/backward-compatible total
+IsOutOfZoneBooking
+bit
+NO
+GAP-003. Default 0
+OutOfZoneDistanceKm
+decimal(8,2)
+YES
+GAP-003
+OutOfZoneSurchargeAmount
+decimal(10,2)
+YES
+GAP-003
+OutOfZoneSurchargeAcceptedAt
+datetime2
+YES
+GAP-003 customer acceptance
+PrioritySurchargeAmount
+decimal(10,2)
+YES
+Allowed amount only. No priority admin gate
+FuelSurchargeAmount
+decimal(10,2)
+YES
+Fuel surcharge component
+Status
+int
+NO
+BookingStatus enum
+ProviderRejectionReason
+nvarchar(500)
+YES
+Provider rejection note
+CancellationReason
+nvarchar(500)
+YES
+Customer/provider reason
+CancelledAt
+datetime2
+YES
+GAP-001
+CancellationInitiatedByRole
+int
+YES
+GAP-001. 0=Customer, 1=Provider
+CancellationRefundPct
+decimal(5,2)
+YES
+GAP-001 stored at cancellation time
+ProviderCancellationPenaltyApplied
+bit
+NO
+GAP-001. Default 0
+ReassignedToBookingId
+uniqueidentifier
+YES
+GAP-015. FK -> Bookings.Id
+OriginalBookingId
+uniqueidentifier
+YES
+GAP-015. FK -> Bookings.Id
+ReassignedAt
+datetime2
+YES
+GAP-015
+CreatedAt
+datetime2
+NO
+UTC
+ConfirmedAt
+datetime2
+YES
+UTC
+PaymentCapturedAt
+datetime2
+YES
+UTC
+StartedAt
+datetime2
+YES
+UTC
+CompletedMarkedAt
+datetime2
+YES
+Provider marked complete
+CompletionConfirmedAt
+datetime2
+YES
+Customer or auto confirmation
+DisputeOpenedAt
+datetime2
+YES
+UTC
+FieldVerificationDispatchedAt
+datetime2
+YES
+v2 field verification
+Timestamp
+rowversion
+NO
+GAP-024 optimistic concurrency token
+17. BookingTimeAdjustmentRequests
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+BookingId
+uniqueidentifier
+NO
+FK -> Bookings.Id
+RequestedAdditionalHrs
+decimal(4,2)
+NO
+Must be > 0 and <= 2.0
+AdditionalCostAmount
+decimal(10,2)
+NO
+Extra amount
+Status
+int
+NO
+0=Pending, 1=Approved, 2=Rejected, 3=Expired
+ProviderNote
+nvarchar(300)
+YES
+Provider explanation
+CustomerAcknowledgedAt
+datetime2
+YES
+Required before escrow modification
+CreatedAt
+datetime2
+NO
+UTC
+18. OperatorAssignments
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+OperatorId
+uniqueidentifier
+NO
+FK -> Operators.Id
+BookingId
+uniqueidentifier
+NO
+FK -> Bookings.Id
+ScheduledStart
+datetime2
+NO
+Schedule start
+ScheduledEnd
+datetime2
+NO
+Schedule end
+Status
+int
+NO
+Assignment status
+CreatedAt
+datetime2
+NO
+UTC
+19. EscrowRecords
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+BookingId
+uniqueidentifier
+YES
+FK -> Bookings.Id, unique when not null
+MarketplaceOrderId
+uniqueidentifier
+YES
+FK -> MarketplaceOrders.Id, unique when not null
+AdjustmentRequestId
+uniqueidentifier
+YES
+GAP-002. FK -> BookingTimeAdjustmentRequests.Id
+GrossAmount
+decimal(10,2)
+NO
+Captured gross amount
+PlatformCommission
+decimal(10,2)
+NO
+Computed commission amount
+CommissionRateSnapshot
+decimal(5,4)
+NO
+GAP-018. Rate used at capture time
+ProviderPayout
+decimal(10,2)
+NO
+Provider payout
+VatAmount
+decimal(10,2)
+NO
+VAT amount
+PartialSettleCustomerAmt
+decimal(10,2)
+YES
+Partial settlement customer amount
+PartialSettleProviderAmt
+decimal(10,2)
+YES
+Partial settlement provider amount
+Status
+int
+NO
+EscrowStatus enum
+PaymentGatewayReference
+nvarchar(200)
+YES
+Gateway reference
+AdditionalHoldDays
+int
+NO
+Provider tier-based hold
+EarliestReleaseAt
+datetime2
+YES
+GAP-019. Completion + buffer + hold
+CapturedAt
+datetime2
+YES
+UTC
+HeldAt
+datetime2
+YES
+UTC
+ReleasedAt
+datetime2
+YES
+UTC
+FrozenAt
+datetime2
+YES
+UTC
+FreezeReason
+nvarchar(500)
+YES
+Freeze reason
+CreatedAt
+datetime2
+NO
+UTC
+Timestamp
+rowversion
+NO
+GAP-019 optimistic concurrency token
+20. MarketplaceListings
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+SellerId
+uniqueidentifier
+NO
+FK -> Users.Id
+CategoryId
+int
+NO
+FK -> Categories.Id
+Title
+nvarchar(200)
+NO
+Listing title
+Condition
+int
+NO
+Product condition enum
+YearOfManufacture
+int
+YES
+Manufacture year
+Description
+nvarchar(max)
+NO
+Description
+Specifications
+nvarchar(max)
+YES
+Structured or text specs
+Price
+decimal(10,2)
+NO
+List price
+IsNegotiable
+bit
+NO
+Final schema has no Offers table, negotiation disabled or handled outside SQL
+TransactionMethod
+int
+NO
+Marketplace transaction method
+Governorate
+nvarchar(100)
+YES
+Listing location
+District
+nvarchar(100)
+YES
+Listing location
+Status
+int
+NO
+Marketplace listing status
+AiRiskScore
+int
+YES
+AI moderation output
+AiRiskLevel
+nvarchar(50)
+YES
+AI moderation output
+AiRiskFlags
+nvarchar(max)
+YES
+AI flags JSON
+VideoUrl
+nvarchar(500)
+YES
+Optional video URL
+QdrantPointId
+nvarchar(100)
+YES
+GAP-008
+LastEmbeddedAt
+datetime2
+YES
+GAP-008
+EmbeddingStatus
+int
+NO
+GAP-008
+AdminRejectionNote
+nvarchar(500)
+YES
+GAP-011
+RejectedByAdminId
+uniqueidentifier
+YES
+FK -> Users.Id
+RejectedAt
+datetime2
+YES
+UTC
+SubmissionCount
+int
+NO
+GAP-011
+CreatedAt
+datetime2
+NO
+UTC
+UpdatedAt
+datetime2
+NO
+UTC
+21. MarketplaceListingPhotos
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ListingId
+uniqueidentifier
+NO
+FK -> MarketplaceListings.Id
+PhotoUrl
+nvarchar(500)
+NO
+Blob URL
+DisplayOrder
+int
+NO
+Ordering
+CreatedAt
+datetime2
+NO
+UTC
+22. MarketplaceOrders
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+BuyerId
+uniqueidentifier
+NO
+FK -> Users.Id
+ListingId
+uniqueidentifier
+NO
+FK -> MarketplaceListings.Id
+Amount
+decimal(10,2)
+NO
+Order amount
+DeliveryAddress
+nvarchar(1000)
+YES
+Delivery address
+DeliveryPreference
+int
+YES
+Delivery preference enum
+TrackingNumber
+nvarchar(100)
+YES
+Shipping tracking number
+Status
+int
+NO
+GAP-016 MarketplaceOrderStatus 0-9
+SellerConfirmedAt
+datetime2
+YES
+UTC
+DispatchedAt
+datetime2
+YES
+UTC
+DeliveredAt
+datetime2
+YES
+UTC
+ConfirmedByBuyerAt
+datetime2
+YES
+UTC
+CancellationReason
+nvarchar(500)
+YES
+Cancellation reason
+CancelledAt
+datetime2
+YES
+GAP-016
+CancellationInitiatedByRole
+int
+YES
+0=Buyer,1=Seller,2=Admin
+ReturnShippingCost
+decimal(10,2)
+YES
+GAP-016
+ReturnShippingAcceptedByBuyerAt
+datetime2
+YES
+GAP-016
+CreatedAt
+datetime2
+NO
+UTC
+23. Reviews
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ReviewerId
+uniqueidentifier
+NO
+FK -> Users.Id
+ReviewedUserId
+uniqueidentifier
+NO
+FK -> Users.Id
+BookingId
+uniqueidentifier
+YES
+FK -> Bookings.Id
+ServiceListingId
+uniqueidentifier
+YES
+GAP-029. FK -> ServiceListings.Id
+MarketplaceOrderId
+uniqueidentifier
+YES
+FK -> MarketplaceOrders.Id
+MarketplaceListingId
+uniqueidentifier
+YES
+GAP-029. FK -> MarketplaceListings.Id
+Rating
+int
+NO
+1-5
+Comment
+nvarchar(max)
+YES
+Review text
+ModerationStatus
+int
+NO
+AI moderation status
+IsPublished
+bit
+NO
+Publish flag
+CreatedAt
+datetime2
+NO
+UTC
+PublishedAt
+datetime2
+YES
+UTC
+24. Tickets
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+TicketNumber
+nvarchar(20)
+NO
+Unique human-readable number
+SubmittedById
+uniqueidentifier
+NO
+FK -> Users.Id
+AssignedToUserId
+uniqueidentifier
+YES
+FK -> Users.Id, employee or admin
+ResolvedByUserId
+uniqueidentifier
+YES
+FK -> Users.Id
+BookingId
+uniqueidentifier
+YES
+FK -> Bookings.Id
+MarketplaceOrderId
+uniqueidentifier
+YES
+FK -> MarketplaceOrders.Id
+Subject
+nvarchar(200)
+NO
+Subject line
+Category
+int
+NO
+TicketCategory enum
+Priority
+int
+NO
+Default 0
+Status
+int
+NO
+TicketStatus enum
+AiSummary
+nvarchar(max)
+YES
+AI neutral summary
+AiIdentifiedIssue
+nvarchar(500)
+YES
+AI issue extraction
+AiClaimedImpact
+nvarchar(500)
+YES
+AI claimed impact
+AiEscalationPriority
+int
+YES
+AI priority suggestion
+ResolutionType
+int
+YES
+TicketResolutionType enum
+AdminResolution
+nvarchar(max)
+YES
+Admin resolution text
+AdminResponseDeadline
+datetime2
+YES
+GAP-020 SLA deadline
+EscalatedAt
+datetime2
+YES
+GAP-020
+EscalatedToAdminId
+uniqueidentifier
+YES
+GAP-020 FK -> Users.Id
+FirstResponseAt
+datetime2
+YES
+UTC
+ResolvedAt
+datetime2
+YES
+UTC
+ClosedAt
+datetime2
+YES
+UTC
+ReopenedAt
+datetime2
+YES
+UTC
+CreatedAt
+datetime2
+NO
+UTC
+UpdatedAt
+datetime2
+NO
+UTC
+25. TicketMessages
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+TicketId
+uniqueidentifier
+NO
+FK -> Tickets.Id
+SenderId
+uniqueidentifier
+NO
+FK -> Users.Id
+Body
+nvarchar(max)
+NO
+Message body
+MessageType
+int
+NO
+User, Admin, System, Internal note
+IsInternal
+bit
+NO
+Internal-only note flag
+CreatedAt
+datetime2
+NO
+UTC
+26. TicketAttachments
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+TicketMessageId
+uniqueidentifier
+NO
+FK -> TicketMessages.Id
+UploadedByUserId
+uniqueidentifier
+NO
+FK -> Users.Id
+FileUrl
+nvarchar(500)
+NO
+Blob URL
+FileName
+nvarchar(255)
+NO
+Original file name
+FileType
+int
+NO
+Image, PDF, video, other
+CreatedAt
+datetime2
+NO
+UTC
+27. JobCompletionEvidenceForms
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+BookingId
+uniqueidentifier
+NO
+FK -> Bookings.Id, unique
+SubmittedByUserId
+uniqueidentifier
+NO
+FK -> Users.Id
+ReviewedByAdminId
+uniqueidentifier
+YES
+FK -> Users.Id
+ProviderNotes
+nvarchar(2000)
+YES
+Provider completion notes
+Status
+int
+NO
+EvidenceFormStatus enum
+AdminReviewNote
+nvarchar(500)
+YES
+Admin note
+SubmittedAt
+datetime2
+YES
+UTC
+ReviewedAt
+datetime2
+YES
+UTC
+CreatedAt
+datetime2
+NO
+UTC
+28. JobCompletionEvidencePhotos
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+FormId
+uniqueidentifier
+NO
+FK -> JobCompletionEvidenceForms.Id
+PhotoUrl
+nvarchar(500)
+NO
+Blob URL
+Caption
+nvarchar(200)
+YES
+Photo label
+DisplayOrder
+int
+NO
+Ordering
+CreatedAt
+datetime2
+NO
+UTC
+29. FieldVerificationForms
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+BookingId
+uniqueidentifier
+NO
+FK -> Bookings.Id, unique
+DispatchedEmployeeId
+uniqueidentifier
+NO
+FK -> Users.Id where Role=Employee
+DispatchedByAdminId
+uniqueidentifier
+NO
+FK -> Users.Id
+DecidedByAdminId
+uniqueidentifier
+YES
+FK -> Users.Id
+LinkedEvidenceFormId
+uniqueidentifier
+NO
+FK -> JobCompletionEvidenceForms.Id
+DispatchInstructions
+nvarchar(1000)
+YES
+Admin dispatch instructions
+VisitStatus
+int
+NO
+VisitStatus enum
+EmployeeNotes
+nvarchar(2000)
+YES
+Employee observations
+FieldVerificationOutcome
+int
+YES
+FieldVerificationOutcome enum
+AiSimilarityScore
+decimal(5,4)
+YES
+0.0000-1.0000 visual comparison score
+AiSimilarityNotes
+nvarchar(1000)
+YES
+AI narrative
+AdminDecision
+int
+NO
+FieldVerificationAdminDecision enum
+AdminDecisionNote
+nvarchar(500)
+YES
+Final admin decision note
+DispatchedAt
+datetime2
+NO
+UTC
+VisitedAt
+datetime2
+YES
+UTC
+FormSubmittedAt
+datetime2
+YES
+UTC
+DecidedAt
+datetime2
+YES
+UTC
+CreatedAt
+datetime2
+NO
+UTC
+30. FieldVerificationPhotos
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+FieldVerificationFormId
+uniqueidentifier
+NO
+FK -> FieldVerificationForms.Id
+PhotoUrl
+nvarchar(500)
+NO
+Blob URL
+Caption
+nvarchar(200)
+YES
+Employee label
+DisplayOrder
+int
+NO
+Ordering
+CreatedAt
+datetime2
+NO
+UTC
+31. Conversations
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ServiceListingId
+uniqueidentifier
+YES
+FK -> ServiceListings.Id
+MarketplaceListingId
+uniqueidentifier
+YES
+FK -> MarketplaceListings.Id
+BookingId
+uniqueidentifier
+YES
+FK -> Bookings.Id
+InitiatedById
+uniqueidentifier
+NO
+FK -> Users.Id
+ParticipantId
+uniqueidentifier
+NO
+FK -> Users.Id
+IsLocked
+bit
+NO
+Conversation locked flag
+CreatedAt
+datetime2
+NO
+UTC
+LockedAt
+datetime2
+YES
+UTC
+32. Messages
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ConversationId
+uniqueidentifier
+NO
+FK -> Conversations.Id
+SenderId
+uniqueidentifier
+NO
+FK -> Users.Id
+Content
+nvarchar(max)
+YES
+Message content
+MessageType
+int
+NO
+Text, attachment, system
+AttachmentUrl
+nvarchar(500)
+YES
+Blob URL
+IsBlocked
+bit
+NO
+Contact-info scan result
+SentAt
+datetime2
+NO
+UTC
+33. ConversationReadReceipts
+Column
+Type
+Nullable
+Notes
+ConversationId
+uniqueidentifier
+NO
+Composite PK, FK -> Conversations.Id
+UserId
+uniqueidentifier
+NO
+Composite PK, FK -> Users.Id
+LastReadMessageId
+uniqueidentifier
+YES
+FK -> Messages.Id
+LastReadAt
+datetime2
+NO
+Last read time for user in conversation
+34. Notifications
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+NO
+FK -> Users.Id
+EventType
+nvarchar(100)
+NO
+Event key
+Title
+nvarchar(200)
+NO
+Notification title
+Body
+nvarchar(max)
+YES
+Notification body
+ReferenceId
+nvarchar(100)
+YES
+Related entity id
+ReferenceType
+nvarchar(50)
+YES
+Related entity type
+IsRead
+bit
+NO
+Read flag
+Channel
+int
+NO
+In-app, push, SMS
+SentAt
+datetime2
+NO
+UTC
+ReadAt
+datetime2
+YES
+UTC
+35. ProviderIncidents
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ProviderProfileId
+uniqueidentifier
+NO
+FK -> ProviderProfiles.Id
+BookingId
+uniqueidentifier
+YES
+FK -> Bookings.Id
+IncidentType
+int
+NO
+Unresponsive, late cancellation, etc.
+PenaltyApplied
+bit
+NO
+Default 0
+AdminNote
+nvarchar(500)
+YES
+Admin note
+OccurredAt
+datetime2
+NO
+UTC
+36. PlatformSettings
+Column
+Type
+Nullable
+Notes
+SettingKey
+nvarchar(100)
+NO
+PK
+SettingValue
+nvarchar(max)
+NO
+Value as string/JSON
+Description
+nvarchar(500)
+YES
+Human-readable description
+UpdatedByAdminId
+uniqueidentifier
+YES
+FK -> Users.Id
+UpdatedAt
+datetime2
+NO
+UTC
+37. SearchQueryLogs
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+UserId
+uniqueidentifier
+YES
+FK -> Users.Id, null for guest
+SessionId
+nvarchar(100)
+YES
+Guest/session tracking
+RawQuery
+nvarchar(1000)
+NO
+Original search text
+ExtractedIntentJson
+nvarchar(max)
+YES
+AI extracted intent object
+ContextDomain
+int
+NO
+0=Services, 1=Marketplace
+SearchMode
+int
+NO
+0=Keyword, 1=Semantic, 2=Hybrid
+ResultCount
+int
+NO
+Number of relevant results
+HasLowConfidence
+bit
+NO
+Default 0
+HasZeroResults
+bit
+NO
+Default 0
+AlternativeSuggested
+bit
+NO
+Default 0
+AlternativeAcceptedAt
+datetime2
+YES
+Set when user accepts alternative
+ProcessingMs
+int
+YES
+Search processing latency
+CreatedAt
+datetime2
+NO
+UTC
+38. DomainEventQueue
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+EventType
+nvarchar(100)
+NO
+ListingApproved, ListingEdited, ListingQualityScoreStale, etc.
+EntityType
+nvarchar(50)
+NO
+ServiceListing, MarketplaceListing, etc.
+EntityId
+uniqueidentifier
+NO
+Entity id
+Status
+int
+NO
+0=Pending,1=Processing,2=Processed,3=FailedRetryable,4=DeadLetter
+RetryCount
+int
+NO
+Default 0
+FailureReason
+nvarchar(500)
+YES
+Last failure
+ProcessedAt
+datetime2
+YES
+UTC
+CreatedAt
+datetime2
+NO
+UTC
+39. ProviderTrustScoreHistory
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+ProviderProfileId
+uniqueidentifier
+NO
+FK -> ProviderProfiles.Id
+TrustScore
+decimal(5,2)
+NO
+Snapshot score
+TrustLevel
+int
+NO
+Snapshot trust level
+ComponentRating
+decimal(5,2)
+YES
+30% component
+ComponentCompletion
+decimal(5,2)
+YES
+25% component
+ComponentResponse
+decimal(5,2)
+YES
+20% component
+ComponentDocs
+decimal(5,2)
+YES
+15% component
+ComponentIncident
+decimal(5,2)
+YES
+Penalty component
+TriggerEvent
+nvarchar(50)
+YES
+Event that caused recalculation
+RecordedAt
+datetime2
+NO
+UTC
+40. CategoryPricingAggregates
+Column
+Type
+Nullable
+Notes
+CategoryId
+int
+NO
+Composite PK, FK -> Categories.Id
+LocationGovernorate
+nvarchar(100)
+NO
+Composite PK
+PriceType
+int
+NO
+Composite PK. 0=Hourly,1=Daily,2=Marketplace
+MedianPrice
+decimal(10,2)
+NO
+Cached aggregate
+Percentile25
+decimal(10,2)
+NO
+Cached aggregate
+Percentile75
+decimal(10,2)
+NO
+Cached aggregate
+MinPrice
+decimal(10,2)
+NO
+Cached aggregate
+MaxPrice
+decimal(10,2)
+NO
+Cached aggregate
+SampleCount
+int
+NO
+Number of records used
+ComputedAt
+datetime2
+NO
+UTC
+41. AiInteractionLogs
+Column
+Type
+Nullable
+Notes
+Id
+uniqueidentifier
+NO
+PK
+AgentType
+int
+NO
+Moderator, OCR, Search, Vision, Concierge, etc.
+InvocationContext
+nvarchar(100)
+NO
+Moderation, pricing, search, dispute, etc.
+EntityType
+nvarchar(50)
+YES
+Related entity type
+EntityId
+uniqueidentifier
+YES
+Related entity id
+AiRecommendation
+nvarchar(50)
+YES
+AI decision/recommendation
+AiRiskScore
+int
+YES
+AI risk score
+AdminOverride
+nvarchar(50)
+YES
+Admin override value
+AdminOverrideById
+uniqueidentifier
+YES
+FK -> Users.Id
+AdminOverrideAt
+datetime2
+YES
+UTC
+LatencyMs
+int
+YES
+AI call latency
+InputTokens
+int
+YES
+LLM input tokens
+OutputTokens
+int
+YES
+LLM output tokens
+CreatedAt
+datetime2
+NO
+UTC
+ExpiresAt
+computed
+NO
+Persisted DATEADD(day, 90, CreatedAt)
+8. Required Indexes, Constraints and Operational Rules
+Table
+Name / Rule
+Purpose
+ProviderProfiles
+SIX_ProviderProfiles_ServiceZoneCenter
+Spatial index on ServiceZoneCenter using GEOGRAPHY_AUTO_GRID.
+BookingTimeAdjustmentRequests
+UX_TimeAdj_BookingId_Pending
+Only one pending adjustment request per booking.
+BookingTimeAdjustmentRequests
+IX_TimeAdj_BookingId
+Lookup by BookingId and Status.
+SearchQueryLogs
+IX_SearchQueryLogs_CreatedAt
+Dashboard analytics by CreatedAt, includes context and result metrics.
+SearchQueryLogs
+IX_SearchQueryLogs_UserId
+User-specific search history when UserId is not null.
+DomainEventQueue
+IX_DomainEventQueue_Processing
+Background worker pulls pending and retryable failed events.
+ServiceListingAvailability
+UX_ListingAvailability_Day
+One availability row per listing per day.
+BlackoutDates
+Booking conflict query update
+Conflict engine must union operator assignment conflicts with blackout date conflicts.
+Bookings
+CK_Bookings_NoSelfReassign
+Prevents direct self-reassignment links.
+MarketplaceOrders
+CK_MarketplaceOrders_Status
+Status must be between 0 and 9.
+EscrowRecords
+UX_EscrowRecords_BookingId
+One escrow record per booking when BookingId is not null.
+EscrowRecords
+UX_EscrowRecords_OrderId
+One escrow record per marketplace order when MarketplaceOrderId is not null.
+OperatorAssignments
+IX_OperatorAssignments_ConflictDetection
+Filtered covering index for active/confirmed schedule conflicts.
+ServiceListingOperators
+IX_ServiceListingOperators_ListingId
+Supports conflict checks by listing.
+Notifications
+IX_Notifications_UserUnread
+Unread notification inbox per user.
+Notifications
+IX_Notifications_AdminQueue
+Unread operational/admin notification queue.
+Reviews
+CK_Reviews_SingleContext
+Review must belong to exactly one service or marketplace context.
+Reviews
+IX_Reviews_ServiceListingId
+Listing-level service review lookup.
+Reviews
+IX_Reviews_MarketplaceListingId
+Listing-level marketplace review lookup.
+ProviderProfiles
+IX_ProviderProfiles_AlternativeSearch
+Alternative provider search by response rate, rating and tier.
+AiInteractionLogs
+IX_AiInteractionLogs_EntityId
+AI logs by entity and agent.
+AiInteractionLogs
+IX_AiInteractionLogs_FalsePositive
+AI false-positive/admin override analysis.
+AiInteractionLogs
+IX_AiInteractionLogs_Expiry
+90-day retention cleanup.
+9. Required PlatformSettings Seeds
+SettingKey
+Purpose
+CancellationPolicyBands
+JSON band definition for refund windows.
+CommissionRate
+Commission rate used to populate EscrowRecords.CommissionRateSnapshot.
+DuplicateListingThreshold
+Full-text duplicate listing match threshold.
+FieldVerificationDispatchSlaHours
+Default 4. Existing v2 field ops SLA key.
+FieldVerificationCompletionSlaHours
+Default 24. Existing v2 field ops SLA key.
+TrustScoreThresholdPremiumVerification
+Customer trust threshold for premium service verification.
+10. Service-Layer Requirements
+EscrowService must validate BookingTimeAdjustmentRequests.CustomerAcknowledgedAt is not null before modifying EscrowRecords.GrossAmount.
+EscrowService must store EscrowRecords.AdjustmentRequestId when a time-adjustment request changes escrow.
+Escrow release must use rowversion concurrency on EscrowRecords.Timestamp. A concurrent release attempt must fail and be logged.
+Bookings updates must use Bookings.Timestamp as the EF Core concurrency token.
+CancellationRefundPct must be stored at cancellation time and must not be recomputed later for disputes.
+Out-of-zone surcharge acceptance must set OutOfZoneSurchargeAcceptedAt before payment proceeds.
+TicketService must compute AdminResponseDeadline at ticket creation using the business-day SLA calendar.
+Conversation unread counts must be derived from ConversationReadReceipts rather than writing Messages.IsRead per message.
+Qdrant synchronization must be driven through DomainEventQueue, not an in-memory event bus.
+ServiceListingAvailability is the source of truth for operational hours after migration backfill.
+Full-text duplicate listing checks must use SQL Server full-text indexes and a PlatformSettings threshold.
+AI decisions and admin overrides must be written to AiInteractionLogs with 90-day retention cleanup.

@@ -3,19 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز القيادة | شير جير (مدير)</title>
+    <title>مركز القيادة والتحكم | شير جير (مدير)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/layouts.css">
     <style>
-        .risk-value { font-size: 2.5rem; font-weight: 900; color: var(--danger); }
         .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
         .admin-sidebar-override .sidebar-logo { color: white; }
         .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
         .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
         .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--s4);
+            margin-bottom: var(--s6);
+        }
+        .metric-card {
+            border-right: 4px solid var(--primary);
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: var(--s5);
+            border-left: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin: var(--s2) 0;
+            display: block;
+        }
+        .metric-label {
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: var(--text-sm);
+        }
+        .metric-sub {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+        }
+
+        .alert-banner {
+            background: rgba(239, 68, 68, 0.08);
+            border-right: 4px solid var(--danger);
+            border-radius: var(--radius-sm);
+            padding: var(--s4);
+            margin-bottom: var(--s4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--danger);
+            font-weight: 700;
+        }
+        .alert-banner button {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 4px var(--s3);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: var(--text-xs);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--s4);
+            margin-bottom: var(--s6);
+        }
+        .action-card {
+            text-align: center;
+            padding: var(--s5);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .action-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: var(--s2);
+            display: block;
+        }
+
+        .elapsed-badge {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            font-weight: 700;
+        }
+        .event-item {
+            padding: var(--s3);
+            background: rgba(255,255,255,0.03);
+            border-radius: var(--radius-sm);
+            border-right: 3px solid var(--primary);
+            font-size: var(--text-sm);
+        }
+        [data-theme="light"] .event-item {
+            background: rgba(0,0,0,0.02);
+        }
     </style>
 </head>
 <body>
@@ -28,88 +128,108 @@
 
             <main class="page-content">
                 <div class="container">
-                    <header class="page-header animate-on-scroll">
+                    <header class="page-header animate-on-scroll" style="display:flex; justify-content:space-between; align-items:center;">
                         <div class="section-title">
                             <h1>مركز القيادة والتحكم</h1>
-                            <p>مراقبة حية لعمليات المنصة والمؤشرات الحيوية</p>
+                            <p>مراقبة حية لعمليات المنصة، مؤشرات الـ SLA وإشراف الـ AI</p>
                         </div>
-                        <div class="header-actions">
-                            <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);">إيقاف الطوارئ (Kill Switch)</button>
+                        <div>
+                            <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="triggerKillSwitch()">إيقاف الطوارئ (Kill Switch)</button>
                         </div>
                     </header>
 
-                    <div class="dashboard-grid animate-on-scroll">
-                        <div class="card" style="border-right: 4px solid var(--danger); background: rgba(239, 68, 68, 0.02); transform: none; box-shadow: none;">
-                            <p style="font-weight: 700; margin-bottom: 8px;">مؤشر المخاطر العام (AI)</p>
-                            <span class="risk-value">12%</span>
-                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: 8px;">طبيعي - لا يوجد تهديد مباشر</p>
+                    <!-- SLA Breach Alerts -->
+                    <div id="sla-alerts-container"></div>
+
+                    <!-- Dashboard counters -->
+                    <div class="metrics-grid animate-on-scroll">
+                        <div class="metric-card" style="border-right-color: var(--info);">
+                            <span class="metric-label">الحجوزات النشطة</span>
+                            <span class="metric-value" id="active-bookings">-</span>
+                            <span class="metric-sub" style="color: var(--info);">حجوزات قيد التنفيذ (IN_PROGRESS)</span>
                         </div>
-                        <div class="card" style="border-right: 4px solid var(--warning); background: rgba(245, 158, 11, 0.02); transform: none; box-shadow: none;">
-                            <p style="font-weight: 700; margin-bottom: 8px;">النزاعات المفتوحة</p>
-                            <span class="risk-value" style="color: var(--warning);">5</span>
-                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: 8px;">تحتاج إلى تدخل المشرفين</p>
+                        <div class="metric-card" style="border-right-color: var(--warning);">
+                            <span class="metric-label">استجابات المزود المعلقة</span>
+                            <span class="metric-value" id="pending-responses">-</span>
+                            <span class="metric-sub" style="color: var(--warning);">بانتظار قبول أو رفض المهمة</span>
                         </div>
-                        <div class="card" style="border-right: 4px solid var(--primary); background: rgba(244, 163, 0, 0.02); transform: none; box-shadow: none;">
-                            <p style="font-weight: 700; margin-bottom: 8px;">أموال في الضمان (Escrow)</p>
-                            <span class="risk-value" style="color: var(--primary);">2.4M</span>
-                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: 8px;">ريال سعودي قيد الحجز</p>
+                        <div class="metric-card" style="border-right-color: var(--primary);">
+                            <span class="metric-label">قوائم قيد المراجعة</span>
+                            <span class="metric-value" id="listings-review">-</span>
+                            <span class="metric-sub" style="color: var(--primary);">قوائم معدات وسوق تحتاج تدقيق</span>
+                        </div>
+                        <div class="metric-card" style="border-right-color: var(--danger);">
+                            <span class="metric-label">النزاعات والشكاوى المفتوحة</span>
+                            <span class="metric-value" id="open-disputes">-</span>
+                            <span class="metric-sub" id="disputes-sub" style="color: var(--danger);">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <h3 style="margin-bottom: var(--s4);" class="animate-on-scroll">الوصول السريع للمهام</h3>
+                    <div class="quick-actions animate-on-scroll">
+                        <div class="action-card" onclick="window.navigateTo('admin-listing-review.html')">
+                            <span class="action-icon">📋</span>
+                            <strong>طابور مراجعة القوائم</strong>
+                        </div>
+                        <div class="action-card" onclick="window.navigateTo('admin-tickets.html')">
+                            <span class="action-icon">🎫</span>
+                            <strong>إدارة تذاكر الدعم والنزاعات</strong>
+                        </div>
+                        <div class="action-card" onclick="window.navigateTo('admin-field-verification.html')">
+                            <span class="action-icon">🔍</span>
+                            <strong>عمليات التحقق الميداني</strong>
+                        </div>
+                        <div class="action-card" onclick="window.navigateTo('admin-escrow.html')">
+                            <span class="action-icon">🏦</span>
+                            <strong>مراقبة الضمان المالي</strong>
+                        </div>
+                        <div class="action-card" onclick="window.navigateTo('admin-ai-config.html')">
+                            <span class="action-icon">⚙️</span>
+                            <strong>إعدادات الذكاء الاصطناعي</strong>
+                        </div>
+                        <div class="action-card" onclick="window.navigateTo('admin-users.html')">
+                            <span class="action-icon">👥</span>
+                            <strong>إدارة المستخدمين والأدوار</strong>
                         </div>
                     </div>
 
                     <div class="dashboard-content-layout">
-                        <section class="card animate-on-scroll">
-                            <div class="card-header">
+                        <!-- Live Operations Table -->
+                        <section class="card animate-on-scroll" style="padding: var(--s5);">
+                            <div class="card-header" style="margin-bottom: var(--s4);">
                                 <h3 class="card-title">العمليات الحية (Live Operations)</h3>
                             </div>
                             <div class="table-container">
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>معرف العملية</th>
-                                            <th>النوع</th>
-                                            <th>الأطراف</th>
+                                            <th>رقم الحجز</th>
+                                            <th>العميل</th>
+                                            <th>المزود</th>
+                                            <th>القيمة</th>
                                             <th>الحالة</th>
+                                            <th>حالة SLA</th>
+                                            <th>الإجراء</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>#TR-001</td>
-                                            <td><span class="badge badge-success">حجز معدة</span></td>
-                                            <td>أحمد (ع) - النور (م)</td>
-                                            <td><span class="status-chip">جاري الدفع</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#TR-002</td>
-                                            <td><span class="badge badge-danger">نزاع</span></td>
-                                            <td>خالد (ع) - السويدي (م)</td>
-                                            <td><span class="status-chip" style="color: var(--danger); border-color: var(--danger);">مفتوح</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#TR-003</td>
-                                            <td><span class="badge badge-warning">مراجعة AI</span></td>
-                                            <td>إضافة معدة جديدة</td>
-                                            <td><span class="status-chip">مرفوض آلياً (صور سيئة)</span></td>
-                                        </tr>
+                                    <tbody id="operations-table-body">
+                                        <tr><td colspan="7" style="text-align:center; padding: 20px;">جاري تحميل العمليات الحية...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </section>
 
-                        <aside class="card animate-on-scroll" style="background: var(--dark-accent); color: white; border: none; height: fit-content;">
-                            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                                🤖 تنبيهات الذكاء الاصطناعي
+                        <!-- AI Activity Feed -->
+                        <aside class="card animate-on-scroll" style="background: var(--dark-accent); color: white; border: none; height: fit-content; padding: var(--s5);">
+                            <h3 style="margin-bottom: var(--s4); display: flex; align-items: center; gap: 10px;">
+                                🤖 نشاط خوارزميات الـ AI
                             </h3>
-                            <div class="flex flex-col gap-4">
-                                <div style="padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px; border-right: 3px solid var(--danger);">
-                                    <strong style="color: #FCA5A5;">احتيال محتمل</strong>
-                                    <p style="font-size: 0.85rem; margin-top: 5px; color: rgba(255,255,255,0.7);">اكتشف النظام نمط حجز متكرر ومشبوه من الحساب #USER-882</p>
-                                </div>
-                                <div style="padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px; border-right: 3px solid var(--warning);">
-                                    <strong style="color: #FCD34D;">تلاعب بالأسعار</strong>
-                                    <p style="font-size: 0.85rem; margin-top: 5px; color: rgba(255,255,255,0.7);">مزود الخدمة "شركة الرواد" قام برفع الأسعار بنسبة 300% فجأة.</p>
-                                </div>
+                            <p style="color: rgba(255,255,255,0.7); font-size: var(--text-xs); margin-bottom: 20px;">آخر أحداث وتوصيات المشرف الآلي (Moderator Agent)</p>
+                            <div style="display: flex; flex-direction: column; gap: var(--s4);" id="ai-events-list">
+                                <div style="text-align:center; padding: 10px;">جاري التحميل...</div>
                             </div>
-                            <button class="btn btn-primary w-full" style="margin-top: 24px;" onclick="navigateTo('ai-config.html')">الانتقال للوحة الـ AI</button>
+                            <button class="btn btn-primary w-full" style="margin-top: var(--s5);" onclick="window.navigateTo('admin-ai-config.html')">لوحة تحكم الـ AI</button>
                         </aside>
                     </div>
                 </div>
@@ -119,9 +239,125 @@
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script src="../js/app.js"></script>
     <script src="../js/components/app-navbar.js"></script>
     <script src="../js/components/app-sidebar.js"></script>
     <script src="../js/components/app-footer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const data = await window.API.getAdminDashboard();
+                
+                // Set counters
+                document.getElementById('active-bookings').innerText = data.active_bookings_count;
+                document.getElementById('pending-responses').innerText = data.pending_provider_responses_count;
+                document.getElementById('listings-review').innerText = data.listings_pending_review_count;
+                document.getElementById('open-disputes').innerText = data.open_disputes_count;
+                
+                const db = data.disputes_priority_breakdown;
+                document.getElementById('disputes-sub').innerText = `${db.high} حرجة | ${db.medium} متوسطة | ${db.low} منخفضة`;
+                
+                // Populate SLA alerts
+                const alertsContainer = document.getElementById('sla-alerts-container');
+                alertsContainer.innerHTML = '';
+                if (data.sla_breach_alerts && data.sla_breach_alerts.length > 0) {
+                    data.sla_breach_alerts.forEach(alert => {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert-banner';
+                        alertDiv.innerHTML = `
+                            <span>⚠️ <strong>تنبيه تجاوز الاتفاقية:</strong> ${alert.message}</span>
+                            <button onclick="resolveSlaAlert('${alert.booking_id || alert.ticket_id}')">معالجة فورية ⚡</button>
+                        `;
+                        alertsContainer.appendChild(alertDiv);
+                    });
+                }
+                
+                // Populate Operations Table
+                const tableBody = document.getElementById('operations-table-body');
+                tableBody.innerHTML = '';
+                if (data.live_operations && data.live_operations.length > 0) {
+                    data.live_operations.forEach(op => {
+                        const tr = document.createElement('tr');
+                        
+                        let badgeColorClass = 'badge-info';
+                        if (op.status === 'Disputed') badgeColorClass = 'badge-danger';
+                        if (op.status === 'InProgress') badgeColorClass = 'badge-success';
+                        if (op.status === 'PendingFieldVerification') badgeColorClass = 'badge-warning';
+
+                        let slaColorStyle = 'color: var(--success);';
+                        if (op.sla_state === 'warning') slaColorStyle = 'color: var(--warning); font-weight: 700;';
+                        if (op.sla_state === 'danger') slaColorStyle = 'color: var(--danger); font-weight: 700;';
+                        
+                        tr.innerHTML = `
+                            <td><strong>#${op.booking_id}</strong></td>
+                            <td>${op.customer}</td>
+                            <td>${op.provider}</td>
+                            <td>${op.amount} ريال</td>
+                            <td><span class="badge ${badgeColorClass}">${op.status_ar}</span></td>
+                            <td style="${slaColorStyle}">${op.sla_state_ar}</td>
+                            <td>
+                                <button class="btn btn-outline btn-icon" style="padding: 4px 8px; font-size:var(--text-xs);" onclick="viewBookingDetails('${op.booking_id}')">
+                                    تفاصيل 📄
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">لا يوجد عمليات حية حالياً</td></tr>';
+                }
+                
+                // Populate AI Activity Feed
+                const aiList = document.getElementById('ai-events-list');
+                aiList.innerHTML = '';
+                if (data.ai_events && data.ai_events.length > 0) {
+                    data.ai_events.forEach(evt => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'event-item';
+                        
+                        let borderCol = 'var(--primary)';
+                        if (evt.agent_type === 'Moderator') borderCol = 'var(--danger)';
+                        if (evt.agent_type === 'Vision') borderCol = 'var(--success)';
+                        if (evt.agent_type === 'Search') borderCol = 'var(--info)';
+                        
+                        itemDiv.style.borderRightColor = borderCol;
+                        itemDiv.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong style="color:var(--primary); font-size: 0.85rem;">🤖 ${evt.agent_type} Agent</strong>
+                                <span style="font-size:0.75rem; color:rgba(255,255,255,0.5);">${evt.created_at}</span>
+                            </div>
+                            <p style="margin-bottom:5px;">${evt.description}</p>
+                            <div style="font-size:0.75rem; color:rgba(255,255,255,0.6); display:flex; gap:10px;">
+                                <span>التوصية: <strong>${evt.ai_recommendation}</strong></span>
+                                <span>الاستجابة: ${evt.latency_ms}ms</span>
+                            </div>
+                        `;
+                        aiList.appendChild(itemDiv);
+                    });
+                } else {
+                    aiList.innerHTML = '<div style="text-align:center; padding:10px;">لا يوجد أحداث ذكاء اصطناعي حالياً</div>';
+                }
+                
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل بيانات مركز القيادة', 'danger');
+            }
+        });
+        
+        function triggerKillSwitch() {
+            if (confirm('تنبيه أمني! هل أنت متأكد من رغبتك في تفعيل زر إيقاف الطوارئ (Kill Switch) للمنصة بالكامل؟ سيتم تجميد جميع المعاملات النشطة والعمليات والمدفوعات مؤقتاً لحين مراجعة النظام.')) {
+                window.showToast('تم تفعيل إيقاف الطوارئ بنجاح! تم قفل المنصة مؤقتاً.', 'danger');
+            }
+        }
+        
+        function resolveSlaAlert(id) {
+            window.showToast(`تم فتح حوار سريع لمعالجة تجاوز SLA المعرف: ${id}`);
+        }
+        
+        function viewBookingDetails(id) {
+            window.showToast(`تحويل لصفحة تفاصيل الحجز: ${id}`);
+        }
+    </script>
 </body>
 </html>

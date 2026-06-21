@@ -1,0 +1,75 @@
+[
+  {
+    "id": "LST-9001",
+    "title": "رافعة تلسكوبية 50 طن مع مشغل مرخص",
+    "provider_name": "مؤسسة النخبة للمعدات",
+    "category_name": "أوناش ورافعات",
+    "type": "Service",
+    "submitted_date": "2026-06-20",
+    "ai_risk_score": 12,
+    "ai_risk_level": "LOW",
+    "ai_risk_badge_class": "badge-success",
+    "hourly_rate": 150.0,
+    "daily_rate": 1200.0,
+    "ai_risk_report": "النص المدخل في العنوان والوصف سليم بنسبة 98%. لا يوجد إشارات لخدمات تواصل خارجي أو كلمات مدرجة في القائمة السوداء.",
+    "document_verification": {
+      "document_type": "ترخيص تشغيل رافعة ثقيلة",
+      "status": "Verified",
+      "status_ar": "مقبول ومطابق",
+      "ocr_confidence": 98.4,
+      "expiry_date": "2028-12-31"
+    },
+    "similar_listings": [
+      {"title": "كرين تلسكوبي 50 طن", "price": 140.0, "provider": "شركة المقاولات المتحدة"},
+      {"title": "ونش رافعة 50 طن", "price": 160.0, "provider": "شركة الرواد الدولية"}
+    ]
+  },
+  {
+    "id": "LST-9002",
+    "title": "مولد كهرباء 500 كيلوواط كاتربيلر مستعمل للبيع",
+    "provider_name": "شركة الجزيرة للمعدات والآليات",
+    "category_name": "مولدات طاقة",
+    "type": "Marketplace",
+    "submitted_date": "2026-06-21",
+    "ai_risk_score": 58,
+    "ai_risk_level": "MEDIUM",
+    "ai_risk_badge_class": "badge-warning",
+    "price": 85000.0,
+    "ai_risk_report": "تحذير: السعر المعروض 85,000 ريال يقع ضمن فئة شذوذ الأسعار المرتفعة (أعلى بنسبة 40% من متوسط القيمة السوقية). تم العثور على تشابه بنسبة 72% مع إعلان خارجي.",
+    "document_verification": {
+      "document_type": "مستند إثبات ملكية الآلية",
+      "status": "PendingOCR",
+      "status_ar": "قيد المطابقة الرقمية",
+      "ocr_confidence": 75.2,
+      "expiry_date": "N/A"
+    },
+    "similar_listings": [
+      {"title": "مولد كاتربيلر 500 كيلوواط 2020", "price": 62000.0, "provider": "مؤسسة القحطاني للتجارة"},
+      {"title": "مولد كهرباء CAT 500KVA", "price": 65000.0, "provider": "شركة اليسر للمكائن"}
+    ]
+  },
+  {
+    "id": "LST-9003",
+    "title": "ونش كرين 100 طن تواصل مباشر واتساب 0501234567",
+    "provider_name": "مكتب الحربي للنقل",
+    "category_name": "أوناش ورافعات",
+    "type": "Service",
+    "submitted_date": "2026-06-21",
+    "ai_risk_score": 92,
+    "ai_risk_level": "HIGH",
+    "ai_risk_badge_class": "badge-danger",
+    "hourly_rate": 300.0,
+    "daily_rate": 2400.0,
+    "ai_risk_report": "انتهاك صارخ للسياسات (مستوى المخاطرة 92%): تم رصد محاولة مشاركة أرقام تواصل مباشر في العنوان والوصف لطلب الدفع الخارجي. كلمات محظورة: 'واتساب', '0501234567'.",
+    "document_verification": {
+      "document_type": "ترخيص بلدية وتأمين المعدة",
+      "status": "Failed",
+      "status_ar": "فشل التحقق التلقائي",
+      "ocr_confidence": 42.0,
+      "expiry_date": "2025-01-01"
+    },
+    "similar_listings": [
+      {"title": "كرين حمولة 100 طن", "price": 280.0, "provider": "شركة الرافعات الوطنية"}
+    ]
+  }
+]

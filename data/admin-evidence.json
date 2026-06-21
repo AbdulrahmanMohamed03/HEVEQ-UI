@@ -1,0 +1,49 @@
+[
+  {
+    "id": "EV-3301",
+    "booking_id": "BK-1002",
+    "submitted_by_user_id": "USR-0002",
+    "provider_name": "شركة السويدي للإلكترونيات",
+    "provider_notes": "لقد أتممنا أعمال صيانة المحول بالكامل وفحصنا لوحة التشغيل. المولد يعمل الآن بكفاءة مستمرة وتم تشغيل النظام وعداد القراءة سليم تماماً.",
+    "status": 1,
+    "status_ar": "تم التقديم (Submitted)",
+    "status_name": "Submitted",
+    "submitted_at": "2026-06-20T16:00:00Z",
+    "booking_status": "Disputed",
+    "booking_status_ar": "نزاع قائم (Disputed)",
+    "photos": [
+      {
+        "id": "PH-4401",
+        "photo_url": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80",
+        "caption": "لوحة تشغيل المولد والعداد يظهر التشغيل السليم"
+      },
+      {
+        "id": "PH-4402",
+        "photo_url": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=600&q=80",
+        "caption": "المحول الكهربائي الرئيسي بعد الصيانة وعزل الكابلات"
+      }
+    ],
+    "admin_review_note": ""
+  },
+  {
+    "id": "EV-3302",
+    "booking_id": "BK-1001",
+    "submitted_by_user_id": "USR-0002",
+    "provider_name": "المقاولون العرب",
+    "provider_notes": "اكتملت أعمال رفع الهياكل الحديدية بالونش 50 طن في الموقع المحدد وتسليم الموقع للمشرف.",
+    "status": 3,
+    "status_ar": "مقبول كإثبات (AcceptedAsEvidence)",
+    "status_name": "AcceptedAsEvidence",
+    "submitted_at": "2026-06-19T12:00:00Z",
+    "booking_status": "Completed",
+    "booking_status_ar": "مكتمل (Completed)",
+    "photos": [
+      {
+        "id": "PH-4403",
+        "photo_url": "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=600&q=80",
+        "caption": "الونش أثناء العمل بالموقع ورفع الهياكل"
+      }
+    ],
+    "admin_review_note": "الصور والمستندات مطابقة للشروط وتؤكد التنفيذ الكامل."
+  }
+]

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراقبة الضمان المالي | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .modal {
+            position: fixed;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--bg-card);
+            padding: var(--s6);
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>نظام مراقبة الضمان المالي وحجز الأموال (Escrow Monitoring)</h1>
+                            <p>متابعة الدفعات المحتجزة في بوابات الدفع، اقتطاع عمولات المنصة وتطبيق تسويات الإفراج والتعويض اليدوية</p>
+                        </div>
+                    </header>
+
+                    <!-- Overview Widgets -->
+                    <div class="dashboard-grid animate-on-scroll">
+                        <div class="card widget-card">
+                            <div class="widget-info">
+                                <p>إجمالي الرصيد المحجوز بالضمان</p>
+                                <h3 style="color: var(--primary);" id="total-held-amt">2,450,000 ريال</h3>
+                            </div>
+                            <div class="widget-icon">🔒</div>
+                        </div>
+                        <div class="card widget-card">
+                            <div class="widget-info">
+                                <p>دفعات جاهزة للتحرير</p>
+                                <h3 style="color: var(--success);" id="total-ready-amt">125,000 ريال</h3>
+                            </div>
+                            <div class="widget-icon">💸</div>
+                        </div>
+                        <div class="card widget-card">
+                            <div class="widget-info">
+                                <p>دفعات معلقة بنزاعات</p>
+                                <h3 style="color: var(--danger);" id="total-dispute-amt">18,400 ريال</h3>
+                            </div>
+                            <div class="widget-icon">🛑</div>
+                        </div>
+                    </div>
+
+                    <!-- Escrow Table -->
+                    <div class="card animate-on-scroll">
+                        <h3 style="margin-bottom: var(--s4);">سجلات الضمان المالي للمدفوعات (EscrowRecords)</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>معرف سجل الضمان</th>
+                                        <th>المرجع المرتبط</th>
+                                        <th>الأطراف المشمولة</th>
+                                        <th>القيمة وتفصيل العمولة</th>
+                                        <th>تاريخ التحرير المتوقع</th>
+                                        <th>أهلية الصرف والضمان</th>
+                                        <th>حالة الحجز</th>
+                                        <th>الإجراء الاستثنائي</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="escrow-table-body">
+                                    <tr><td colspan="8" style="text-align:center; padding: 20px;">جاري تحميل سجلات الضمان المالي...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Escrow Override Modal -->
+    <div class="modal" id="escrow-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: var(--s3); color: var(--danger);">إجراء مالي استثنائي (تسوية الضمان المالي)</h3>
+            <div style="background:rgba(239, 68, 68, 0.05); border:1px solid rgba(239, 68, 68, 0.2); padding: 12px; border-radius:8px; margin-bottom:15px; font-size:var(--text-xs); color: var(--danger);">
+                ⚠️ <strong>تحذير الرقابة المالية:</strong> هذا الإجراء يتجاوز أقفال النظام البرمجية المعتادة (System Rules) ويقوم بتحويل أو إرجاع الأموال يدوياً. يلزم إدخال مبرر رسمي للمطابقة والتدقيق المالي.
+            </div>
+            
+            <form id="escrow-form">
+                <input type="hidden" id="esc-record-id">
+                <div class="form-group">
+                    <label class="form-label">نوع العملية الاستثنائية</label>
+                    <select class="form-input" id="esc-action" required>
+                        <option value="release">تحرير كامل المبلغ للمزود (Manual Release)</option>
+                        <option value="refund">إرجاع كامل المبلغ للعميل (Manual Refund)</option>
+                        <option value="partial">تسوية جزئية (Manual Settle)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="partial-amounts-group" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 15px;">
+                    <div>
+                        <label class="form-label">حصة العميل (ريال)</label>
+                        <input type="number" class="form-input" id="esc-partial-customer" value="0" min="0">
+                    </div>
+                    <div>
+                        <label class="form-label">حصة المزود (ريال)</label>
+                        <input type="number" class="form-input" id="esc-partial-provider" value="0" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">مبرر وسند العملية المالي</label>
+                    <textarea class="form-input" id="esc-reason" rows="4" placeholder="اكتب رقم تذكرة النزاع، السند القانوني أو تفاصيل التسوية الميدانية..." required></textarea>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="closeEscrowModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" style="background:var(--danger); box-shadow:none;">تأكيد وصرف الأموال 💸</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let escrowData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadEscrow();
+        });
+
+        async function loadEscrow() {
+            try {
+                escrowData = await window.API.getAdminEscrow();
+                renderEscrowTable();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل سجلات الضمان المالي', 'danger');
+            }
+        }
+
+        function renderEscrowTable() {
+            const tableBody = document.getElementById('escrow-table-body');
+            tableBody.innerHTML = '';
+
+            if (escrowData.length > 0) {
+                escrowData.forEach(esc => {
+                    const tr = document.createElement('tr');
+                    
+                    let refLabel = '';
+                    if (esc.booking_id) {
+                        refLabel = `حجز: <a href="admin-tickets.html" style="color:var(--primary); font-weight:700;">#${esc.booking_id}</a>`;
+                    } else if (esc.marketplace_order_id) {
+                        refLabel = `طلب سوق: <a href="#" style="color:var(--primary); font-weight:700;">#${esc.marketplace_order_id}</a>`;
+                    }
+
+                    let statusBadge = 'badge-warning';
+                    if (esc.status === 1) statusBadge = 'badge-success'; // Released
+                    if (esc.status === 2) statusBadge = 'badge-danger';  // Frozen
+
+                    const earliestReleaseStr = esc.earliest_release_at 
+                        ? new Date(esc.earliest_release_at).toLocaleDateString('ar-SA')
+                        : 'فوري';
+
+                    const pctStr = (esc.commission_rate_snapshot * 100).toFixed(0);
+
+                    tr.innerHTML = `
+                        <td><strong>#${esc.id}</strong></td>
+                        <td>${refLabel}</td>
+                        <td>
+                            <div style="font-size:var(--text-xs);">
+                                <div>العميل: ${esc.customer_name}</div>
+                                <div>المزود: ${esc.provider_name}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:var(--text-xs);">
+                                <strong>الإجمالي: ${esc.gross_amount} ريال</strong>
+                                <div class="text-muted" style="margin-top:2px;">
+                                    العمولة (${pctStr}%): ${esc.platform_commission} ريال | للمزود: ${esc.provider_payout} ريال
+                                </div>
+                            </div>
+                        </td>
+                        <td>${earliestReleaseStr}</td>
+                        <td style="font-size:var(--text-xs); max-width:200px;">${esc.release_eligibility}</td>
+                        <td><span class="badge ${statusBadge}">${esc.status_ar}</span></td>
+                        <td>
+                            ${esc.status !== 1 ? `
+                                <button class="btn btn-outline" style="padding: 4px 8px; font-size:var(--text-xs); border-color:var(--danger); color:var(--danger);" onclick="openEscrowModal('${esc.id}', ${esc.gross_amount})">
+                                    تسوية يدوية ⚙️
+                                </button>
+                            ` : `
+                                <span class="text-muted" style="font-size:var(--text-xs);">مغلق ومصروف</span>
+                            `}
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">لا يوجد سجلات ضمان مالي حالياً.</td></tr>';
+            }
+        }
+
+        function openEscrowModal(id, grossAmount) {
+            document.getElementById('esc-record-id').value = id;
+            document.getElementById('esc-reason').value = '';
+            document.getElementById('esc-action').value = 'release';
+            
+            // Setup partial values limits
+            document.getElementById('esc-partial-customer').max = grossAmount;
+            document.getElementById('esc-partial-provider').max = grossAmount;
+            document.getElementById('esc-partial-customer').value = 0;
+            document.getElementById('esc-partial-provider').value = grossAmount;
+            
+            document.getElementById('partial-amounts-group').style.display = 'none';
+            document.getElementById('escrow-modal').classList.add('show');
+        }
+
+        document.getElementById('esc-action').addEventListener('change', (e) => {
+            const isPartial = e.target.value === 'partial';
+            document.getElementById('partial-amounts-group').style.display = isPartial ? 'grid' : 'none';
+        });
+
+        function closeEscrowModal() {
+            document.getElementById('escrow-modal').classList.remove('show');
+        }
+
+        document.getElementById('escrow-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('esc-record-id').value;
+            const action = document.getElementById('esc-action').value;
+            const reason = document.getElementById('esc-reason').value;
+            
+            const esc = escrowData.find(es => es.id === id);
+            if (!esc) return;
+
+            if (action === 'release') {
+                esc.status = 1;
+                esc.status_ar = "محرر (Released)";
+                esc.release_eligibility = "تم التحرير يدوياً بقرار إداري";
+                window.showToast(`تم تحرير الدفعة #${id} للمزود ${esc.provider_name} بنجاح.`);
+            } else if (action === 'refund') {
+                esc.status = 1;
+                esc.status_ar = "مرتجع بالكامل (Refunded)";
+                esc.release_eligibility = "تم إرجاع المبلغ يدوياً للعميل بقرار إداري";
+                window.showToast(`تمت تسوية الحساب وإرجاع المبلغ للعميل ${esc.customer_name}.`, 'danger');
+            } else if (action === 'partial') {
+                const customerAmt = parseFloat(document.getElementById('esc-partial-customer').value);
+                const providerAmt = parseFloat(document.getElementById('esc-partial-provider').value);
+                
+                if (customerAmt + providerAmt > esc.gross_amount) {
+                    window.showToast('مجموع مبالغ التسوية الجزئية يتجاوز إجمالي مبلغ الحجز!', 'danger');
+                    return;
+                }
+                
+                esc.status = 1;
+                esc.status_ar = "تسوية جزئية (Released)";
+                esc.release_eligibility = `تسوية جزئية: ${customerAmt} ريال للعميل و ${providerAmt} ريال للمزود`;
+                window.showToast(`تمت التسوية الجزئية بنجاح: العميل ${customerAmt} ريال، المزود ${providerAmt} ريال.`);
+            }
+            
+            renderEscrowTable();
+            closeEscrowModal();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات المنصة | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--s5);
+            margin-bottom: var(--s6);
+        }
+        @media (max-width: 992px) {
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+
+        .settings-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: var(--s5);
+            box-shadow: var(--shadow-sm);
+        }
+        .setting-row {
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--s3) 0;
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="section-title">
+                            <h1>إعدادات المنصة التشغيلية (Platform Settings)</h1>
+                            <p>تعديل وتخصيص مفاتيح السياسات، نسب العمولات، مهلات الـ SLA وفترات التوثيق والتأكيد المعتمدة بقواعد البيانات</p>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-outline" onclick="resetSettings()">إعادة تعيين المعايير 🔄</button>
+                            <button class="btn btn-primary" onclick="saveSettings()">حفظ التغييرات 💾</button>
+                        </div>
+                    </header>
+
+                    <div class="settings-grid animate-on-scroll" id="settings-container">
+                        <!-- Grouped settings dynamically loaded -->
+                        <div class="card" style="grid-column: span 2; text-align:center; padding: 40px;">جاري تحميل معلمات التكوين...</div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let settingsData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSettings();
+        });
+
+        async function loadSettings() {
+            try {
+                settingsData = await window.API.getPlatformSettings();
+                renderSettings();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل إعدادات المنصة', 'danger');
+            }
+        }
+
+        function renderSettings() {
+            const container = document.getElementById('settings-container');
+            container.innerHTML = '';
+
+            // Group settings by group field
+            const groups = {};
+            settingsData.forEach(setting => {
+                if (!groups[setting.group]) {
+                    groups[setting.group] = [];
+                }
+                groups[setting.group].push(setting);
+            });
+
+            // Icons mapping for visual appeal
+            const groupIcons = {
+                "Booking": "📅 إعدادات الحجوزات والسياسات",
+                "Escrow": "🏦 الضمان المالي والعمولات",
+                "AI": "🤖 الذكاء الاصطناعي والمطابقة",
+                "Field Operations": "🔍 العمليات الميدانية والتحقق",
+                "Marketplace": "🛒 المتجر وسوق السلع",
+                "Tickets": "🎫 تذاكر الدعم والـ SLA"
+            };
+
+            Object.keys(groups).forEach(groupName => {
+                const card = document.createElement('div');
+                card.className = 'settings-card';
+                
+                const titleText = groupIcons[groupName] || `⚙️ إعدادات فئة ${groupName}`;
+                
+                let rowsHtml = '';
+                groups[groupName].forEach(set => {
+                    rowsHtml += `
+                        <div class="setting-row">
+                            <div class="setting-header">
+                                <strong style="font-size:var(--text-sm);">${set.key}</strong>
+                                <input type="text" class="form-input" style="max-width: 250px; padding: 6px 12px; font-size:var(--text-xs);" 
+                                       value="${set.value}" id="input-${set.key}" onchange="updateValue('${set.key}', this.value)">
+                            </div>
+                            <span class="text-muted" style="font-size:var(--text-xs); display:block; margin-top:2px;">${set.description}</span>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <h3 style="border-bottom:2px solid var(--primary); padding-bottom:8px; margin-bottom:15px; color:var(--text-main); font-size:var(--text-base);">
+                        ${titleText}
+                    </h3>
+                    <div style="display:flex; flex-direction:column;">
+                        ${rowsHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateValue(key, value) {
+            const setting = settingsData.find(s => s.key === key);
+            if (setting) {
+                setting.value = value;
+            }
+        }
+
+        function saveSettings() {
+            // Simulated save
+            window.showToast('تم حفظ تحديثات إعدادات المنصة التشغيلية (PlatformSettings) بنجاح!');
+        }
+
+        async function resetSettings() {
+            if (confirm('هل أنت متأكد من رغبتك في إعادة تعيين جميع إعدادات وقيم السياسات للوضع الافتراضي؟')) {
+                await loadSettings();
+                window.showToast('تمت إعادة تعيين القيم الافتراضية بنجاح.');
+            }
+        }
+    </script>
+</body>
+</html>

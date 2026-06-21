@@ -251,3 +251,19 @@ body.sidebar-open .sidebar-overlay {
     grid-template-columns: 1fr;
   }
 }
+
+/* Custom Scrollbar for Sidebar Navigation */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius);
+}

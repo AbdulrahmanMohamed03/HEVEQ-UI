@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراجعة الحسابات والوثائق | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            visibility: hidden;
+            opacity: 0;
+            z-index: 2999;
+            transition: var(--transition);
+        }
+        .drawer-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .details-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 500px;
+            max-width: 100%;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            transform: translateX(-100%);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            padding: var(--s5);
+            overflow-y: auto;
+        }
+        .details-drawer.show {
+            transform: translateX(0);
+        }
+
+        .filter-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--s3);
+            margin-bottom: var(--s5);
+        }
+
+        .ocr-fields-box {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            padding: var(--s4);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            margin-bottom: var(--s4);
+        }
+        .ai-analysis-panel {
+            background: rgba(244, 163, 0, 0.04);
+            border: 1px solid rgba(244, 163, 0, 0.15);
+            padding: var(--s4);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            margin-bottom: var(--s4);
+        }
+        .id-previews {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: var(--s3) 0;
+        }
+        .id-previews img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>مراجعة وثائق وتراخيص الحسابات (Account Verification Reviews)</h1>
+                            <p>التدقيق المالي والإداري على مستندات الهوية الوطنية والسجلات التجارية بعد التحقق التلقائي للـ AI</p>
+                        </div>
+                    </header>
+
+                    <!-- Search and filters -->
+                    <div class="card filter-bar animate-on-scroll">
+                        <div>
+                            <label class="form-label">بحث باسم المستخدم</label>
+                            <input type="text" class="form-input" id="search-input" placeholder="ابحث..." oninput="filterRequests()">
+                        </div>
+                        <div>
+                            <label class="form-label">نوع الحساب</label>
+                            <select class="form-input" id="role-filter" onchange="filterRequests()">
+                                <option value="all">الكل</option>
+                                <option value="customer">عملاء (Customer)</option>
+                                <option value="provider">مزودي خدمة (Provider)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">حالة التدقيق والمطابقة</label>
+                            <select class="form-input" id="status-filter" onchange="filterRequests()">
+                                <option value="all">الكل</option>
+                                <option value="WaitingAdminApproval">بانتظار موافقة الإدارة</option>
+                                <option value="UnderAiReview">تحت مراجعة الـ AI</option>
+                                <option value="AdminApproved">معتمد وموثق</option>
+                                <option value="AdminRejected">مرفوض</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Requests Table -->
+                    <div class="card animate-on-scroll">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>المستخدم والدور</th>
+                                        <th>البريد والهاتف</th>
+                                        <th>تاريخ الرفع</th>
+                                        <th>ثقة مطابقة الـ AI</th>
+                                        <th>توصية الـ AI</th>
+                                        <th>الحالة الحالية</th>
+                                        <th>الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="verification-table-body">
+                                    <tr><td colspan="7" style="text-align:center; padding: 20px;">جاري تحميل طلبات توثيق الهويات...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Details Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+    <div class="details-drawer" id="details-drawer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--s4); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            <div>
+                <strong id="drawer-user-name">-</strong>
+                <div class="text-muted" style="font-size:var(--text-xs); margin-top:2px;" id="drawer-user-role">-</div>
+            </div>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size:var(--text-xs);" onclick="closeDrawer()">إغلاق ✕</button>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap: var(--s3);">
+            <div>
+                <strong>صور مستندات الهوية الوطنية (UserId identity documents):</strong>
+                <div class="id-previews">
+                    <div>
+                        <span style="font-size:8px; color:var(--text-muted); display:block; margin-bottom:2px;">الوجه الأمامي (Front)</span>
+                        <img id="drawer-front-img" src="" alt="Front ID">
+                    </div>
+                    <div>
+                        <span style="font-size:8px; color:var(--text-muted); display:block; margin-bottom:2px;">الوجه الخلفي (Back)</span>
+                        <img id="drawer-back-img" src="" alt="Back ID">
+                    </div>
+                </div>
+                <div id="commercial-doc-section" style="display:none; margin-top:5px;">
+                    <strong>مستند السجل التجاري / رخصة العمل:</strong>
+                    <img id="drawer-comm-img" src="" style="width:100%; height:120px; object-fit:cover; border:1px solid var(--border-color); border-radius:8px; margin-top:5px;" alt="Commercial Register">
+                </div>
+            </div>
+
+            <!-- OCR fields box -->
+            <div class="ocr-fields-box">
+                <strong style="color:var(--primary); display:block; margin-bottom:5px;">📋 الحقول المستخلصة بالـ OCR (Extracted OCR Fields)</strong>
+                <p><strong>الاسم الكامل المستخلص:</strong> <span id="ocr-name">-</span></p>
+                <p><strong>رقم الهوية الوطنية/السجل:</strong> <span id="ocr-id-number">-</span></p>
+                <p><strong>تاريخ الميلاد:</strong> <span id="ocr-dob">-</span></p>
+                <p><strong>تاريخ الانتهاء:</strong> <span id="ocr-expiry">-</span></p>
+                <p><strong>العنوان الجغرافي المستخلص:</strong> <span id="ocr-address">-</span></p>
+            </div>
+
+            <!-- AI Analysis -->
+            <div class="ai-analysis-panel">
+                <strong style="color:var(--primary); display:block; margin-bottom:5px;">🤖 لوحة تحليل الـ AI ومخاطر التطابق</strong>
+                <p><strong>مستوى ثقة المطابقة:</strong> <span id="ai-conf">-</span>%</p>
+                <p><strong>وجود الحقول الرئيسية:</strong> <span id="ai-fields-ok">-</span></p>
+                <p style="color:var(--danger);"><strong>تحذيرات عدم المطابقة:</strong> <span id="ai-warnings">-</span></p>
+                <p><strong>خطر الحساب المكرر:</strong> <span id="ai-duplicate-warn">-</span></p>
+                <p style="margin-top:5px; border-top:1px dashed rgba(244,163,0,0.2); padding-top:5px;"><strong>توصية الـ AI للقبول:</strong> <span id="ai-rec" style="font-weight:700;">-</span></p>
+            </div>
+
+            <!-- Action form -->
+            <div style="border-top:1px solid var(--border-color); padding-top:15px; display:flex; flex-direction:column; gap:10px;">
+                <div class="form-group">
+                    <label class="form-label">ملاحظات المراجع الإداري (مطلوبة عند الرفض أو طلب إعادة الرفع)</label>
+                    <textarea class="form-input" id="admin-note" rows="3" placeholder="اكتب الملاحظات أو أسباب الرفض لمشاركتها مع العميل..."></textarea>
+                </div>
+                
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+                    <button class="btn btn-primary" style="background:var(--success); box-shadow:none; font-size:var(--text-xs); padding:8px;" onclick="approveVerification()">قبول الحساب 👍</button>
+                    <button class="btn btn-primary" style="background:var(--danger); box-shadow:none; font-size:var(--text-xs); padding:8px;" onclick="rejectVerification()">رفض وتجميد ❌</button>
+                    <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px; border-color:var(--warning); color:var(--warning);" onclick="requestReupload()">إعادة الرفع 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let verifications = [];
+        let filtered = [];
+        let selectedReqId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadVerifications();
+        });
+
+        async function loadVerifications() {
+            try {
+                verifications = await window.API.getAdminAccountVerifications();
+                filtered = [...verifications];
+                renderTable();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل سجلات التحقق', 'danger');
+            }
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('verification-table-body');
+            tableBody.innerHTML = '';
+
+            if (filtered.length > 0) {
+                filtered.forEach(req => {
+                    const tr = document.createElement('tr');
+                    
+                    let badgeColor = 'badge-warning';
+                    if (req.status === 'AdminApproved') badgeColor = 'badge-success';
+                    if (req.status === 'AdminRejected') badgeColor = 'badge-danger';
+                    if (req.status === 'UnderAiReview') badgeColor = 'badge-info';
+
+                    tr.innerHTML = `
+                        <td>
+                            <div>
+                                <strong>${req.user_name}</strong>
+                                <div class="text-muted" style="font-size:var(--text-xs);">${req.role_ar}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:var(--text-xs);">
+                                <div>${req.email}</div>
+                                <div>${req.phone}</div>
+                            </div>
+                        </td>
+                        <td>${req.upload_date}</td>
+                        <td><strong>${req.ai_confidence_score}%</strong></td>
+                        <td>${req.ai_recommendation}</td>
+                        <td><span class="badge ${badgeColor}">${req.status_ar}</span></td>
+                        <td>
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:var(--text-xs);" onclick="openDrawer('${req.id}')">
+                                تفاصيل الوثائق 🪪
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">لا يوجد طلبات توثيق تطابق شروط التصفية.</td></tr>';
+            }
+        }
+
+        function filterRequests() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const roleFilter = document.getElementById('role-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            filtered = verifications.filter(req => {
+                const nameMatch = req.user_name.toLowerCase().includes(query);
+                
+                let roleMatch = true;
+                if (roleFilter !== 'all') {
+                    roleMatch = req.role_name === roleFilter;
+                }
+
+                let statusMatch = true;
+                if (statusFilter !== 'all') {
+                    statusMatch = req.status === statusFilter;
+                }
+
+                return nameMatch && roleMatch && statusMatch;
+            });
+
+            renderTable();
+        }
+
+        function openDrawer(id) {
+            const req = verifications.find(r => r.id === id);
+            if (!req) return;
+
+            selectedReqId = id;
+            document.getElementById('drawer-user-name').innerText = req.user_name;
+            document.getElementById('drawer-user-role').innerText = req.role_ar + ' (Identity Documents Review)';
+            
+            document.getElementById('drawer-front-img').src = req.front_id_url;
+            document.getElementById('drawer-back-img').src = req.back_id_url;
+
+            const commSection = document.getElementById('commercial-doc-section');
+            if (req.role === 1 && req.business_doc_url) {
+                commSection.style.display = 'block';
+                document.getElementById('drawer-comm-img').src = req.business_doc_url;
+            } else {
+                commSection.style.display = 'none';
+            }
+
+            // OCR
+            const ocr = req.ocr_fields;
+            document.getElementById('ocr-name').innerText = ocr.full_name;
+            document.getElementById('ocr-id-number').innerText = ocr.national_id;
+            document.getElementById('ocr-dob').innerText = ocr.dob;
+            document.getElementById('ocr-expiry').innerText = ocr.expiry_date;
+            document.getElementById('ocr-address').innerText = ocr.address;
+
+            // AI analysis
+            const ai = req.ai_analysis;
+            document.getElementById('ai-conf').innerText = ai.confidence_score;
+            document.getElementById('ai-fields-ok').innerText = ai.key_fields_present ? 'نعم (كاملة)' : 'لا (حقول ناقصة)';
+            document.getElementById('ai-warnings').innerText = ai.mismatch_warnings;
+            document.getElementById('ai-duplicate-warn').innerText = ai.suspected_duplicate ? 'نعم (خطر حساب مكرر!)' : 'لا يوجد تطابق مكرر';
+            document.getElementById('ai-rec').innerText = ai.recommendation;
+
+            document.getElementById('admin-note').value = '';
+
+            document.getElementById('drawer-overlay').classList.add('show');
+            document.getElementById('details-drawer').classList.add('show');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer-overlay').classList.remove('show');
+            document.getElementById('details-drawer').classList.remove('show');
+            selectedReqId = null;
+        }
+
+        async function approveVerification() {
+            const req = verifications.find(r => r.id === selectedReqId);
+            if (!req) return;
+
+            await window.API.approveAccountVerification(req.id);
+            
+            req.status = 'AdminApproved';
+            req.status_ar = 'موثق ومعتمد من الإدارة';
+            
+            // Set verified simulation key in local storage so they can login as verified
+            localStorage.setItem('isVerified_' + req.role_name, 'true');
+
+            filterRequests();
+            closeDrawer();
+        }
+
+        async function rejectVerification() {
+            const note = document.getElementById('admin-note').value.trim();
+            if (!note) {
+                window.showToast('ملاحظة الرفض مطلوبة لتسجيل الرفض الإداري', 'warning');
+                return;
+            }
+
+            const req = verifications.find(r => r.id === selectedReqId);
+            if (!req) return;
+
+            await window.API.rejectAccountVerification(req.id, note);
+            
+            req.status = 'AdminRejected';
+            req.status_ar = 'مرفوض من الإدارة';
+            
+            localStorage.removeItem('isVerified_' + req.role_name);
+
+            filterRequests();
+            closeDrawer();
+        }
+
+        async function requestReupload() {
+            const note = document.getElementById('admin-note').value.trim();
+            if (!note) {
+                window.showToast('الرجاء كتابة الملاحظات والأخطاء لمشاركتها مع العميل لإعادة الرفع', 'warning');
+                return;
+            }
+
+            const req = verifications.find(r => r.id === selectedReqId);
+            if (!req) return;
+
+            await window.API.requestDocumentReupload(req.id, note);
+            
+            req.status = 'ReuploadRequired';
+            req.status_ar = 'إعادة الرفع مطلوبة';
+            
+            localStorage.removeItem('isVerified_' + req.role_name);
+
+            filterRequests();
+            closeDrawer();
+        }
+    </script>
+</body>
+</html>

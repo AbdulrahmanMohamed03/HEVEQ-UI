@@ -36,6 +36,7 @@ class AppSidebar extends HTMLElement {
         if (type === 'customer') {
             menuItems = [
                 { icon: '🏠', label: 'الرئيسية', link: 'dashboard.html', active: true },
+                { icon: '🚜', label: 'تأجير المعدات', link: 'services.html' },
                 { icon: '🏗️', label: 'حجوزاتي', link: 'bookings.html' },
                 { icon: '🛒', label: 'السوق', link: 'marketplace.html' },
                 { icon: '💳', label: 'المحفظة', link: 'wallet.html' },
@@ -54,11 +55,17 @@ class AppSidebar extends HTMLElement {
             ];
         } else if (type === 'admin') {
             menuItems = [
-                { icon: '🛡️', label: 'مركز القيادة', link: 'admin.html', active: true },
-                { icon: '⚙️', label: 'إعدادات AI', link: 'ai-config.html' },
-                { icon: '⚖️', label: 'النزاعات', link: 'disputes.html' },
-                { icon: '🏦', label: 'نظام الضمان', link: 'escrow.html' },
-                { icon: '👥', label: 'المزودين', link: 'operators.html' }
+                { icon: '🛡️', label: 'مركز القيادة', link: 'admin.html' },
+                { icon: '🔑', label: 'مراجعة الحسابات', link: 'admin-account-verification.html' },
+                { icon: '📋', label: 'مراجعة القوائم', link: 'admin-listing-review.html' },
+                { icon: '👥', label: 'المستخدمين', link: 'admin-users.html' },
+                { icon: '🎫', label: 'التذاكر والدعم', link: 'admin-tickets.html' },
+                { icon: '✍️', label: 'مراجعة إثباتات التنفيذ', link: 'admin-evidence-review.html' },
+                { icon: '🔍', label: 'التحقق الميداني', link: 'admin-field-verification.html' },
+                { icon: '🏦', label: 'الضمان المالي', link: 'admin-escrow.html' },
+                { icon: '⚙️', label: 'إعدادات AI', link: 'admin-ai-config.html' },
+                { icon: '📊', label: 'التحليلات', link: 'admin-analytics.html' },
+                { icon: '🔧', label: 'إعدادات المنصة', link: 'admin-platform-settings.html' }
             ];
         }
 
@@ -66,10 +73,10 @@ class AppSidebar extends HTMLElement {
 
         this.innerHTML = `
             <aside class="sidebar">
-                <div class="sidebar-logo">
+                <div class="sidebar-logo" style="flex-shrink: 0;">
                     <span>شير</span>جير
                 </div>
-                <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; min-height: 0;">
                     ${menuItems.map(item => {
                         const isActive = currentPath === item.link;
                         return `
@@ -80,7 +87,7 @@ class AppSidebar extends HTMLElement {
                         `;
                     }).join('')}
                 </nav>
-                <div class="sidebar-footer" style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <div class="sidebar-footer" style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); flex-shrink: 0;">
                     <button class="nav-link w-full" id="logout-btn" style="background: none; border: none; cursor: pointer; text-align: right; width: 100%;">
                         <span class="nav-icon">🚪</span>
                         <span class="nav-label">تسجيل الخروج</span>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحليلات والتقارير | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: var(--s5);
+        }
+        .tab-btn {
+            padding: var(--s2) var(--s4);
+            border-radius: var(--radius-sm);
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 700;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .analytics-section {
+            display: none;
+        }
+        .analytics-section.active {
+            display: block;
+        }
+
+        /* Funnel styling */
+        .funnel-stage {
+            padding: 12px;
+            color: white;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: var(--text-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        /* Vertical bar chart */
+        .v-bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: var(--s5);
+            height: 180px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: var(--s4);
+        }
+        .v-bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .v-bar {
+            width: 35px;
+            background: var(--primary);
+            border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease-in-out;
+        }
+
+        .split-bar {
+            height: 24px;
+            border-radius: 99px;
+            overflow: hidden;
+            display: flex;
+            margin: var(--s3) 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>التحليلات وتقارير الأعمال (Analytics & Reporting)</h1>
+                            <p>لوحة مؤشرات نشاط الخدمات، أداء المتجر والسوق الإلكتروني، وإحصاءات محرك البحث الدلالي والذكاء الاصطناعي</p>
+                        </div>
+                    </header>
+
+                    <!-- Navigation Tabs -->
+                    <div class="tabs-nav animate-on-scroll">
+                        <button class="tab-btn active" onclick="switchTab('services')">🚜 تحليلات الخدمات وحجوزات المعدات</button>
+                        <button class="tab-btn" onclick="switchTab('marketplace')">🛒 تحليلات سوق السلع وقطع الغيار</button>
+                        <button class="tab-btn" onclick="switchTab('ai-search')">🔍 تحليلات محرك البحث والـ AI</button>
+                    </div>
+
+                    <!-- Services Tab -->
+                    <div class="analytics-section active" id="sec-services">
+                        <!-- Revenue Counters -->
+                        <div class="metrics-grid animate-on-scroll">
+                            <div class="metric-card" style="border-right-color: var(--success);">
+                                <span class="metric-label">إيرادات الخدمات (اليوم)</span>
+                                <span class="metric-value" id="rev-day">-</span>
+                                <span class="metric-sub">صافي المدفوعات المستلمة اليوم</span>
+                            </div>
+                            <div class="metric-card" style="border-right-color: var(--primary);">
+                                <span class="metric-label">إيرادات الخدمات (الأسبوع)</span>
+                                <span class="metric-value" id="rev-week">-</span>
+                                <span class="metric-sub">الأيام السبعة الأخيرة</span>
+                            </div>
+                            <div class="metric-card" style="border-right-color: var(--info);">
+                                <span class="metric-label">إيرادات الخدمات (الشهر)</span>
+                                <span class="metric-value" id="rev-month">-</span>
+                                <span class="metric-sub">الشهر الحالي بالكامل</span>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-content-layout animate-on-scroll">
+                            <!-- Left: Funnel & governorates -->
+                            <div style="display:flex; flex-direction:column; gap: var(--s5);">
+                                <!-- Funnel -->
+                                <div class="card">
+                                    <h3 style="margin-bottom: var(--s4);">قمع تحويل الحجوزات (Booking Funnel)</h3>
+                                    <div id="funnel-container">
+                                        <!-- Stages dynamically calculated -->
+                                    </div>
+                                </div>
+                                
+                                <!-- governorate heatmap demand -->
+                                <div class="card">
+                                    <h3 style="margin-bottom: var(--s3);">خارطة الطلب حسب المحافظات (Governorate Demand)</h3>
+                                    <div class="table-container">
+                                        <table class="data-table" style="min-width: unset;">
+                                            <thead>
+                                                <tr>
+                                                    <th>المحافظة</th>
+                                                    <th>مستوى الطلب</th>
+                                                    <th>معدات قيد التشغيل</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="geo-demand-table">
+                                                <!-- Dyn -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Category stats -->
+                            <div style="display:flex; flex-direction:column; gap: var(--s5);">
+                                <div class="card">
+                                    <h3 style="margin-bottom: var(--s3);">متوسط قيمة الحجز حسب القسم (ريال)</h3>
+                                    <div class="v-bar-chart" id="avg-booking-chart">
+                                        <!-- Dyn columns -->
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <h3 style="margin-bottom: var(--s3);">أقسام الخدمات الأكثر طلباً</h3>
+                                    <div id="service-cats-list">
+                                        <!-- Dyn -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Marketplace Tab -->
+                    <div class="analytics-section" id="sec-marketplace">
+                        <div class="metrics-grid">
+                            <div class="metric-card" style="border-right-color: var(--primary);">
+                                <span class="metric-label">تحويل صفقات السوق</span>
+                                <span class="metric-value" id="market-conversion">-</span>
+                                <span class="metric-sub">نسبة الشراء من المشاهدات الإجمالية</span>
+                            </div>
+                            <div class="metric-card" style="border-right-color: var(--warning);">
+                                <span class="metric-label font-bold">متوسط وقت أول استفسار</span>
+                                <span class="metric-value" id="market-inquiry">-</span>
+                                <span class="metric-sub">بالساعات من لحظة نشر السلعة</span>
+                            </div>
+                            <div class="metric-card" style="border-right-color: var(--success);">
+                                <span class="metric-label">نشاط البائعين بالموقع</span>
+                                <span class="metric-value" id="market-sellers">-</span>
+                                <span class="metric-sub" id="market-sellers-sub">-</span>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-content-layout">
+                            <!-- Left: categories listings -->
+                            <div class="card">
+                                <h3 style="margin-bottom: var(--s3);">القوائم النشطة بالسوق حسب الفئة</h3>
+                                <div class="table-container">
+                                    <table class="data-table" style="min-width: unset;">
+                                        <thead>
+                                            <tr>
+                                                <th>فئة السلعة بالسوق</th>
+                                                <th>عدد المعروض</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="market-listings-table">
+                                            <!-- Dyn -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Right: prices values -->
+                            <div class="card">
+                                <h3 style="margin-bottom: var(--s3);">متوسط أسعار مبيعات السوق حسب الفئة</h3>
+                                <div id="market-prices-list">
+                                    <!-- Dyn -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Search Tab -->
+                    <div class="analytics-section" id="sec-ai-search">
+                        <div class="metrics-grid">
+                            <div class="metric-card" style="border-right-color: var(--info);">
+                                <span class="metric-label">إجمالي عمليات البحث المعالجة</span>
+                                <span class="metric-value" id="search-total">-</span>
+                                <span class="metric-sub">استعلامات مستخدمين باليوم الحالي</span>
+                            </div>
+                            <div class="metric-card" style="border-right-color: var(--danger);">
+                                <span class="metric-label font-bold text-danger">استعلامات بدون نتائج (Zero Result)</span>
+                                <span class="metric-value" id="search-zero">-</span>
+                                <span class="metric-sub">عمليات بحث لم تعرض أي نتيجة</span>
+                            </div>
+                            <div class="metric-card" style="border-right-color: var(--success);">
+                                <span class="metric-label">قبول الاقتراحات البديلة</span>
+                                <span class="metric-value" id="search-accept">-</span>
+                                <span class="metric-sub">نسبة رضا المستخدم بالاقتراحات البديلة</span>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-content-layout">
+                            <!-- Left: intents -->
+                            <div class="card">
+                                <h3 style="margin-bottom: var(--s3);">استخلاص نية الاستعلام الشائعة (AI Intent Extraction)</h3>
+                                <div class="table-container">
+                                    <table class="data-table" style="min-width: unset;">
+                                        <thead>
+                                            <tr>
+                                                <th>جملة الاستعلام</th>
+                                                <th>التكرار</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="search-intents-table">
+                                            <!-- Dyn -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Right: semantic distribution -->
+                            <div class="card">
+                                <h3 style="margin-bottom: var(--s3);">توزيع استعلامات البحث (دلالي مقابل كلمات مفتاحية)</h3>
+                                <p style="font-size:var(--text-xs); color:var(--text-muted);">نسبة فحص محرك البحث لمعاني الجمل (Qdrant semantic match) مقابل البحث الحرفي</p>
+                                
+                                <div class="split-bar">
+                                    <div id="search-dist-semantic" style="background:var(--primary); color:white; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700;">دلالي (68%)</div>
+                                    <div id="search-dist-keyword" style="background:var(--dark); color:white; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700;">كلمات (32%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let analyticsData = {};
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.analytics-section').forEach(sec => sec.classList.remove('active'));
+            
+            // Find button
+            const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (btn) btn.classList.add('active');
+            
+            const sec = document.getElementById('sec-' + tabId);
+            if (sec) sec.classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadAnalytics();
+        });
+
+        async function loadAnalytics() {
+            try {
+                analyticsData = await window.API.getAdminAnalytics();
+                
+                // RENDER SERVICES TAB
+                const sa = analyticsData.service_analytics;
+                document.getElementById('rev-day').innerText = sa.revenue.day.toLocaleString('ar-SA') + ' ريال';
+                document.getElementById('rev-week').innerText = sa.revenue.week.toLocaleString('ar-SA') + ' ريال';
+                document.getElementById('rev-month').innerText = sa.revenue.month.toLocaleString('ar-SA') + ' ريال';
+
+                // Funnel
+                const funnelContainer = document.getElementById('funnel-container');
+                funnelContainer.innerHTML = '';
+                const stages = [
+                    {"label": "مشاهدات القوائم", "val": sa.conversion_funnel.views, "color": "#1E293B"},
+                    {"label": "اختيارات الحجز المبدئي", "val": sa.conversion_funnel.cart_selections, "color": "#334155"},
+                    {"label": "البدء بالدفع والضمان", "val": sa.conversion_funnel.checkout_initiated, "color": "#475569"},
+                    {"label": "الحجوزات الناجحة المكتملة", "val": sa.conversion_funnel.successful_bookings, "color": "var(--primary)"}
+                ];
+                
+                stages.forEach((stg, i) => {
+                    const widthPct = i === 0 ? 100 : (stg.val / stages[0].val * 100).toFixed(0);
+                    const div = document.createElement('div');
+                    div.className = 'funnel-stage';
+                    div.style.background = stg.color;
+                    div.style.width = widthPct + '%';
+                    div.innerHTML = `
+                        <span>${stg.label}</span>
+                        <span>${stg.val.toLocaleString('ar-SA')} (${widthPct}%)</span>
+                    `;
+                    funnelContainer.appendChild(div);
+                });
+
+                // Demand Geo
+                const geoTable = document.getElementById('geo-demand-table');
+                geoTable.innerHTML = '';
+                sa.geo_demand.forEach(gd => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${gd.governorate}</strong></td>
+                        <td>${gd.demand_level}</td>
+                        <td>${gd.active_jobs}</td>
+                    `;
+                    geoTable.appendChild(tr);
+                });
+
+                // Average booking values by category
+                const avgChart = document.getElementById('avg-booking-chart');
+                avgChart.innerHTML = '';
+                
+                const maxVal = Math.max(...sa.average_booking_value_by_category.map(c => c.value));
+                sa.average_booking_value_by_category.forEach(c => {
+                    const height = (c.value / maxVal * 150).toFixed(0);
+                    const col = document.createElement('div');
+                    col.className = 'v-bar-col';
+                    col.innerHTML = `
+                        <div class="v-bar" style="height:${height}px;" title="${c.value} ريال"></div>
+                        <span style="font-size:9px; font-weight:700;">${c.category}</span>
+                    `;
+                    avgChart.appendChild(col);
+                });
+
+                // Request category list
+                const catsList = document.getElementById('service-cats-list');
+                catsList.innerHTML = '';
+                sa.most_requested_categories.forEach(cat => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'margin-bottom: 10px; font-size:var(--text-xs);';
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                            <span>${cat.category}</span>
+                            <strong>${cat.bookings} حجز (${cat.percentage}%)</strong>
+                        </div>
+                        <div class="progress-container"><div class="progress-bar" style="width: ${cat.percentage}%"></div></div>
+                    `;
+                    catsList.appendChild(div);
+                });
+
+
+                // RENDER MARKETPLACE TAB
+                const ma = analyticsData.marketplace_analytics;
+                document.getElementById('market-conversion').innerText = ma.purchase_conversion_rate + '%';
+                document.getElementById('market-inquiry').innerText = ma.average_time_to_first_inquiry_hours + ' ساعة';
+                
+                document.getElementById('market-sellers').innerText = ma.seller_activity.total_sellers;
+                document.getElementById('market-sellers-sub').innerText = `بائعين جدد: ${ma.seller_activity.new_sellers_this_month} | معادل المعروض: ${ma.seller_activity.average_listings_per_seller}`;
+
+                const listTable = document.getElementById('market-listings-table');
+                listTable.innerHTML = '';
+                ma.active_listings_by_category.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${item.category}</strong></td>
+                        <td>${item.count} سلعة معروضة</td>
+                    `;
+                    listTable.appendChild(tr);
+                });
+
+                const priceList = document.getElementById('market-prices-list');
+                priceList.innerHTML = '';
+                ma.average_sale_price_by_category.forEach(item => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'margin-bottom: 15px; font-size:var(--text-xs);';
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>${item.category}</span>
+                            <strong>متوسط: ${item.price} ريال</strong>
+                        </div>
+                    `;
+                    priceList.appendChild(div);
+                });
+
+
+                // RENDER SEARCH TAB
+                const sea = analyticsData.search_analytics;
+                document.getElementById('search-total').innerText = sea.total_queries_processed.toLocaleString('ar-SA');
+                document.getElementById('search-zero').innerText = sea.zero_result_queries;
+                document.getElementById('search-accept').innerText = sea.alternative_suggestion_acceptance_rate + '%';
+
+                const intentsTable = document.getElementById('search-intents-table');
+                intentsTable.innerHTML = '';
+                sea.common_extracted_intents.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>"${item.intent}"</strong></td>
+                        <td>تم استخلاصها ${item.count} مرة</td>
+                    `;
+                    intentsTable.appendChild(tr);
+                });
+
+                // Semantic split
+                document.getElementById('search-dist-semantic').style.width = sea.distribution.semantic + '%';
+                document.getElementById('search-dist-semantic').innerText = `دلالي (${sea.distribution.semantic}%)`;
+                document.getElementById('search-dist-keyword').style.width = sea.distribution.keyword + '%';
+                document.getElementById('search-dist-keyword').innerText = `كلمات (${sea.distribution.keyword}%)`;
+
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل تحليلات النظام', 'danger');
+            }
+        }
+    </script>
+</body>
+</html>

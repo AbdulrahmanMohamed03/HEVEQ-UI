@@ -1,0 +1,66 @@
+{
+  "service_analytics": {
+    "most_requested_categories": [
+      {"category": "أوناش ورافعات", "bookings": 420, "percentage": 42},
+      {"category": "مولدات طاقة", "bookings": 280, "percentage": 28},
+      {"category": "جرافات وحفارات", "bookings": 200, "percentage": 20},
+      {"category": "معدات هرس ودك", "bookings": 100, "percentage": 10}
+    ],
+    "conversion_funnel": {
+      "views": 15000,
+      "cart_selections": 4500,
+      "checkout_initiated": 2100,
+      "successful_bookings": 1200
+    },
+    "average_booking_value_by_category": [
+      {"category": "أوناش ورافعات", "value": 7500},
+      {"category": "مولدات طاقة", "value": 3400},
+      {"category": "جرافات وحفارات", "value": 8900},
+      {"category": "معدات هرس ودك", "value": 2100}
+    ],
+    "revenue": {
+      "day": 45000,
+      "week": 280000,
+      "month": 1150000
+    },
+    "geo_demand": [
+      {"governorate": "الرياض", "demand_level": "عالي جداً", "active_jobs": 45},
+      {"governorate": "مكة المكرمة", "demand_level": "عالي", "active_jobs": 32},
+      {"governorate": "المنطقة الشرقية", "demand_level": "متوسط", "active_jobs": 20},
+      {"governorate": "عسير", "demand_level": "منخفض", "active_jobs": 8}
+    ]
+  },
+  "marketplace_analytics": {
+    "active_listings_by_category": [
+      {"category": "قطع غيار ونظام هيدروليك", "count": 240},
+      {"category": "إطارات معدات ثقيلة", "count": 85},
+      {"category": "محركات مستعملة", "count": 42}
+    ],
+    "average_time_to_first_inquiry_hours": 14.5,
+    "purchase_conversion_rate": 4.8,
+    "average_sale_price_by_category": [
+      {"category": "قطع غيار ونظام هيدروليك", "price": 450},
+      {"category": "إطارات معدات ثقيلة", "price": 1200},
+      {"category": "محركات مستعملة", "price": 8500}
+    ],
+    "seller_activity": {
+      "total_sellers": 142,
+      "new_sellers_this_month": 18,
+      "average_listings_per_seller": 2.5
+    }
+  },
+  "search_analytics": {
+    "total_queries_processed": 14200,
+    "distribution": {
+      "semantic": 68,
+      "keyword": 32
+    },
+    "zero_result_queries": 420,
+    "common_extracted_intents": [
+      {"intent": "تأجير كرين 100 طن بالرياض", "count": 320},
+      {"intent": "حفارة صغيرة يومي", "count": 180},
+      {"intent": "دينامو مولد كاتربيلر", "count": 95}
+    ],
+    "alternative_suggestion_acceptance_rate": 84.5
+  }
+}

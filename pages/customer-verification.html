@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توثيق الحساب الهوية الوطنية | شير جير</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .verification-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: var(--s5);
+        }
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            padding: var(--s6);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-card);
+            margin-bottom: var(--s4);
+        }
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(244, 163, 0, 0.02);
+        }
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--s2);
+            display: block;
+        }
+        .status-tracker {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: var(--s5);
+            border-radius: var(--radius);
+            margin-bottom: var(--s5);
+        }
+        .preview-img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            margin-top: var(--s2);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <div class="verification-wrapper">
+                        <header class="page-header text-center animate-on-scroll">
+                            <div class="section-title">
+                                <h1>توثيق هوية الحساب 🔒</h1>
+                                <p style="color:var(--text-muted); margin-top:5px;">بموجب السياسات الأمنية لمنصة شير جير، يرجى رفع الهوية الوطنية لتنشيط وتوثيق حساب العميل الخاص بك وتجنب التعليق.</p>
+                            </div>
+                        </header>
+
+                        <!-- Status tracker -->
+                        <div class="status-tracker animate-on-scroll">
+                            <h3 style="margin-bottom:10px;">حالة مستندات الهوية (Documents Status)</h3>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>حالة الفحص والمطابقة:</span>
+                                <span class="badge badge-warning" id="doc-status-badge">غير مرفوع (Not Uploaded)</span>
+                            </div>
+                            <p class="text-muted" style="font-size:var(--text-xs); margin-top:5px;" id="status-desc">يرجى رفع الوجه الأمامي والخلفي للهوية للبدء بالفحص التلقائي.</p>
+                        </div>
+
+                        <!-- Upload zones -->
+                        <div class="animate-on-scroll" id="upload-panel">
+                            <div class="upload-zone" onclick="triggerUpload('front')">
+                                <span class="upload-icon">🪪</span>
+                                <strong>رفع الوجه الأمامي للهوية الوطنية</strong>
+                                <span class="text-muted" style="display:block; font-size:var(--text-xs); margin-top:5px;">صيغ JPG, PNG بحد أقصى 5 ميجابايت</span>
+                                <input type="file" id="input-front" style="display:none;" onchange="handleFile('front', this)">
+                                <img id="preview-front" class="preview-img" alt="Front Preview">
+                            </div>
+
+                            <div class="upload-zone" onclick="triggerUpload('back')">
+                                <span class="upload-icon">💳</span>
+                                <strong>رفع الوجه الخلفي للهوية الوطنية</strong>
+                                <span class="text-muted" style="display:block; font-size:var(--text-xs); margin-top:5px;">صيغ JPG, PNG بحد أقصى 5 ميجابايت</span>
+                                <input type="file" id="input-back" style="display:none;" onchange="handleFile('back', this)">
+                                <img id="preview-back" class="preview-img" alt="Back Preview">
+                            </div>
+
+                            <button class="btn btn-primary w-full" style="padding:15px; margin-top:10px;" id="btn-submit" onclick="submitDocs()" disabled>تقديم المستندات للتحقق المالي ⚡</button>
+                        </div>
+
+                        <!-- Simulation and bypass panel -->
+                        <div class="card animate-on-scroll" style="margin-top:var(--s6); border-color:var(--primary); background:rgba(244,163,0,0.02);">
+                            <h4 style="color:var(--primary); margin-bottom:10px;">🧪 لوحة محاكاة عمليات التحقق والموافقة (QA Testing)</h4>
+                            <p style="font-size:var(--text-xs); margin-bottom:15px;">استخدم أزرار المحاكاة لتجربة الحالات المختلفة لردود الـ AI والإشراف الإداري دون الحاجة لربط حقيقي بالخلفية.</p>
+                            
+                            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:15px;">
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px;" onclick="simulateAI('AiApproved')">👍 محاكاة قبول الـ AI</button>
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px; border-color:var(--warning); color:var(--warning);" onclick="simulateAI('AiWarning')">⚠️ محاكاة تحذير الـ AI</button>
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px; border-color:var(--danger); color:var(--danger);" onclick="simulateAI('AiRejected')">❌ محاكاة رفض الـ AI</button>
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px; border-color:var(--success); color:var(--success);" onclick="simulateAdminApproval()">👑 موافقة إدارية كاملة</button>
+                            </div>
+
+                            <button class="btn btn-primary w-full" style="background:var(--dark); box-shadow:none; padding:12px;" onclick="bypassVerification()">
+                                تجاوز والذهاب للوحة التحكم (مستند موثق) 🚪
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let fileFront = null;
+        let fileBack = null;
+
+        function triggerUpload(side) {
+            document.getElementById('input-' + side).click();
+        }
+
+        function handleFile(side, input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (side === 'front') fileFront = file;
+                else fileBack = file;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview-' + side);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+
+                window.showToast(`تم تحميل صورة ${side === 'front' ? 'الوجه الأمامي' : 'الوجه الخلفي'} بنجاح.`);
+                
+                // Enable submit button if both uploaded
+                if (fileFront && fileBack) {
+                    document.getElementById('btn-submit').removeAttribute('disabled');
+                }
+            }
+        }
+
+        async function submitDocs() {
+            try {
+                const statusBadge = document.getElementById('doc-status-badge');
+                statusBadge.innerText = 'جاري إرسال المستندات...';
+                statusBadge.className = 'badge badge-info';
+                
+                // Simulate delay
+                setTimeout(() => {
+                    localStorage.setItem('verified_uploaded_customer', 'true');
+                    localStorage.setItem('verified_ai_status_customer', 'AiPending');
+                    
+                    statusBadge.innerText = 'قيد مراجعة الـ AI (AI Review Pending)';
+                    statusBadge.className = 'badge badge-warning';
+                    document.getElementById('status-desc').innerText = 'تم رفع المستندات بنجاح إلى سجلات UserId. محرك التدقيق (OCR + AI Vision) يقوم بمطابقة البيانات وسيقوم بإظهار النتائج قريباً.';
+                    
+                    window.showToast('تم رفع الهوية بنجاح وبدء فحص الـ AI التلقائي.');
+                }, 1000);
+            } catch (err) {
+                console.error(err);
+                window.showToast('خطأ أثناء تقديم المستندات', 'danger');
+            }
+        }
+
+        function simulateAI(status) {
+            localStorage.setItem('verified_ai_status_customer', status);
+            const badge = document.getElementById('doc-status-badge');
+            const desc = document.getElementById('status-desc');
+
+            if (status === 'AiApproved') {
+                badge.innerText = 'مقبول آلياً (AI Approved)';
+                badge.className = 'badge badge-success';
+                desc.innerText = 'لقد قام محرك الذكاء الاصطناعي بمطابقة الهوية بنسبة ثقة عالية (98.4%). بانتظار الاعتماد الإداري النهائي وصرف الصلاحيات.';
+                window.showToast('فحص الـ AI: المستند سليم وموثق بنجاح.');
+            } else if (status === 'AiWarning') {
+                badge.innerText = 'تحذير آلي (AI Warning)';
+                badge.className = 'badge badge-warning';
+                desc.innerText = 'تنبيه: تم رصد عدم تطابق في العنوان المستخلص من بطاقة الهوية مع عنوان السكن الافتراضي. سيقوم المشرف الإداري بفحص الطلب يدوياً.';
+                window.showToast('فحص الـ AI: تم رصد تحذيرات عدم تطابق العناوين.', 'warning');
+            } else if (status === 'AiRejected') {
+                badge.innerText = 'مرفوض آلياً (AI Rejected)';
+                badge.className = 'badge badge-danger';
+                desc.innerText = 'تم رفض المستند آلياً نظراً لرصد صور رديئة أو مستند منتهي الصلاحية. يرجى مراجعة المستندات وإعادة الرفع.';
+                window.showToast('فحص الـ AI: تم رفض المستند آلياً لعدم وضوح الصور.', 'danger');
+            }
+        }
+
+        function simulateAdminApproval() {
+            localStorage.setItem('isVerified_customer', 'true');
+            localStorage.setItem('verified_ai_status_customer', 'AdminApproved');
+            
+            const badge = document.getElementById('doc-status-badge');
+            badge.innerText = 'موثق ومعتمد من الإدارة (Admin Approved)';
+            badge.className = 'badge badge-success';
+            document.getElementById('status-desc').innerText = 'تهانينا! تم اعتماد ومطابقة حسابك ميدانياً وإدارياً بالكامل. الحساب نشط وجاهز لجميع الحجوزات والمعاملات المالي المتقدمة بالمنصة.';
+            
+            window.showToast('تهانينا! تم توثيق حسابك من الإدارة بالكامل.');
+            
+            setTimeout(() => {
+                window.navigateTo('dashboard.html');
+            }, 2000);
+        }
+
+        function bypassVerification() {
+            localStorage.setItem('isVerified_customer', 'true');
+            window.showToast('محاكاة: تم توثيق الحساب للمستأجر والذهاب للوحة التحكم.');
+            window.navigateTo('dashboard.html');
+        }
+    </script>
+</body>
+</html>

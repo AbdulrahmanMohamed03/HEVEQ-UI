@@ -1,0 +1,67 @@
+[
+  {
+    "id": "VER-1001",
+    "user_id": "USR-0001",
+    "user_name": "أحمد العتيبي",
+    "email": "ahmed.ot@gmail.com",
+    "phone": "+966 50 123 4567",
+    "role": 0,
+    "role_ar": "عميل",
+    "role_name": "customer",
+    "upload_date": "2026-06-21",
+    "ai_confidence_score": 98.4,
+    "ai_recommendation": "Approve (High Match)",
+    "status": "WaitingAdminApproval",
+    "status_ar": "بانتظار موافقة الإدارة (Waiting Admin Approval)",
+    "front_id_url": "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?auto=format&fit=crop&w=600&q=80",
+    "back_id_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80",
+    "ocr_fields": {
+      "full_name": "أحمد حسن العتيبي",
+      "national_id": "1098765432",
+      "dob": "1990-05-14",
+      "expiry_date": "2031-10-12",
+      "address": "الرياض - حي الياسمين - شارع القلعة"
+    },
+    "ai_analysis": {
+      "confidence_score": 98.4,
+      "key_fields_present": true,
+      "mismatch_warnings": "لا يوجد (طبيعي)",
+      "unreadable_document": false,
+      "suspected_duplicate": false,
+      "recommendation": "المستند سليم ومطابق للهوية الوطنية بنسبة 98.4%."
+    }
+  },
+  {
+    "id": "VER-1002",
+    "user_id": "USR-0002",
+    "user_name": "شركة السويدي للكهرباء",
+    "email": "info@elsewedy.com",
+    "phone": "+966 11 444 8888",
+    "role": 1,
+    "role_ar": "مزود خدمة",
+    "role_name": "provider",
+    "upload_date": "2026-06-20",
+    "ai_confidence_score": 75.2,
+    "ai_recommendation": "Warning (Address Mismatch)",
+    "status": "UnderAiReview",
+    "status_ar": "قيد مراجعة الـ AI (Under AI Review)",
+    "front_id_url": "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?auto=format&fit=crop&w=600&q=80",
+    "back_id_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80",
+    "business_doc_url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=600&q=80",
+    "ocr_fields": {
+      "full_name": "مجموعة السويدي للحلول الصناعية",
+      "national_id": "CR-10109988",
+      "dob": "N/A",
+      "expiry_date": "2029-01-01",
+      "address": "الدمام - المنطقة الصناعية الثانية"
+    },
+    "ai_analysis": {
+      "confidence_score": 75.2,
+      "key_fields_present": true,
+      "mismatch_warnings": "تحذير: العنوان المستخلص من السجل التجاري يختلف عن عنوان المقر الرئيسي المسجل بملف المنشأة.",
+      "unreadable_document": false,
+      "suspected_duplicate": false,
+      "recommendation": "إخطار بالتحقق من العنوان أو المطابقة الإدارية اليدوية."
+    }
+  }
+]

@@ -1,0 +1,72 @@
+{
+  "field_verifications": [
+    {
+      "id": "FV-7701",
+      "booking_id": "BK-1002",
+      "dispatched_employee_id": "USR-0004",
+      "dispatched_employee_name": "سعد الشهراني",
+      "dispatched_by_admin_id": "USR-0003",
+      "dispatched_by_admin_name": "عبد الرحمن الرشيد",
+      "linked_evidence_form_id": "EV-3301",
+      "dispatch_instructions": "الرجاء زيارة موقع العزيزية وفحص المولد رقم 500-A للتأكد من صيانته وتشغيله ومطابقة العدادات وصور المزود.",
+      "visit_status": 2,
+      "visit_status_ar": "اكتملت الزيارة (Completed)",
+      "visit_status_name": "Completed",
+      "outcome": 0,
+      "outcome_ar": "تأكيد تنفيذ العمل (JobConfirmed)",
+      "outcome_name": "JobConfirmed",
+      "ai_similarity_score": 0.9450,
+      "ai_similarity_notes": "تطابق عالي للصور الملتقطة ميدانياً مع الصور المقدمة كإثبات من المزود (نسبة تطابق العدادات والموقع 94.5%)",
+      "admin_decision": 0,
+      "admin_decision_ar": "معلق القرار (Pending)",
+      "admin_decision_name": "Pending",
+      "admin_decision_note": "",
+      "photos": [
+        {
+          "id": "FVPH-001",
+          "photo_url": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80",
+          "caption": "لوحة القيادة - صورة فحص الموظف سعد"
+        }
+      ],
+      "dispatched_at": "2026-06-21T11:00:00Z",
+      "visited_at": "2026-06-21T14:30:00Z"
+    },
+    {
+      "id": "FV-7702",
+      "booking_id": "BK-2203",
+      "dispatched_employee_id": "USR-0004",
+      "dispatched_employee_name": "سعد الشهراني",
+      "dispatched_by_admin_id": "USR-0003",
+      "dispatched_by_admin_name": "عبد الرحمن الرشيد",
+      "linked_evidence_form_id": "EV-3301",
+      "dispatch_instructions": "زيارة موقع الهدم بحي الملقا للتحقق من انتهاء عمل الجرافة وسحب المعدة.",
+      "visit_status": 0,
+      "visit_status_ar": "تم التكليف (Dispatched)",
+      "visit_status_name": "Dispatched",
+      "outcome": null,
+      "outcome_ar": "انتظار الزيارة",
+      "outcome_name": "Pending",
+      "ai_similarity_score": null,
+      "ai_similarity_notes": "لا يوجد نتائج بعد (انتظار اكتمال الزيارة)",
+      "admin_decision": 0,
+      "admin_decision_ar": "معلق القرار (Pending)",
+      "admin_decision_name": "Pending",
+      "admin_decision_note": "",
+      "photos": [],
+      "dispatched_at": "2026-06-21T15:30:00Z",
+      "visited_at": null
+    }
+  ],
+  "available_employees": [
+    {
+      "id": "USR-0004",
+      "employee_code": "SG-EMP-04",
+      "first_name": "سعد",
+      "last_name": "الشهراني",
+      "department": "Field Operations",
+      "department_ar": "العمليات الميدانية",
+      "assigned_governorate": "الرياض",
+      "is_available_for_dispatch": true
+    }
+  ]
+}

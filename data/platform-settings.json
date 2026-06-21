@@ -1,0 +1,56 @@
+[
+  {
+    "key": "CommissionRate",
+    "value": "0.15",
+    "description": "نسبة عمولة المنصة المقتطعة من إجمالي قيمة الحجز (مثال: 0.15 تعادل 15%)",
+    "group": "Escrow"
+  },
+  {
+    "key": "CancellationPolicyBands",
+    "value": "[{\"hours\": 24, \"refund_pct\": 100}, {\"hours\": 12, \"refund_pct\": 50}, {\"hours\": 0, \"refund_pct\": 0}]",
+    "description": "شرائح الغرامة للمستأجر عند إلغاء الحجز قبل بدء العمل بالتقويم المالي والساعات",
+    "group": "Booking"
+  },
+  {
+    "key": "DuplicateListingThreshold",
+    "value": "85",
+    "description": "نسبة التشابه في فحص التكرار (Full-text Check) لمنع إضافة قوائم مكررة",
+    "group": "AI"
+  },
+  {
+    "key": "FieldVerificationDispatchSlaHours",
+    "value": "4",
+    "description": "مهلة تكليف موظف التحقق الميداني بعد تقديم طلب الفحص بالساعات",
+    "group": "Field Operations"
+  },
+  {
+    "key": "FieldVerificationCompletionSlaHours",
+    "value": "24",
+    "description": "المهلة القصوى لرفع الموظف الميداني لتقرير إثبات التنفيذ (بالساعات)",
+    "group": "Field Operations"
+  },
+  {
+    "key": "TrustScoreThresholdPremiumVerification",
+    "value": "80.00",
+    "description": "الحد الأدنى لتقييم ثقة العميل (Trust Score) لتجاوز بوابات التحقق الإضافية للحجوزات الفاخرة",
+    "group": "Booking"
+  },
+  {
+    "key": "CustomerAutoConfirmationWindowDays",
+    "value": "3",
+    "description": "المهلة الممنوحة للعميل لتأكيد الإغلاق يدوياً قبل تأكيده آلياً من النظام وتحرير الأموال (بالأيام)",
+    "group": "Booking"
+  },
+  {
+    "key": "MarketplacePurchaseSlaHours",
+    "value": "48",
+    "description": "المهلة الممنوحة للبائع لتأكيد شحن السلعة في السوق قبل الإلغاء التلقائي",
+    "group": "Marketplace"
+  },
+  {
+    "key": "TicketSlaUrgentResponseHours",
+    "value": "3",
+    "description": "مهلة استجابة الدعم للتذاكر المصنفة كحالات حرجة (بالساعات)",
+    "group": "Tickets"
+  }
+]

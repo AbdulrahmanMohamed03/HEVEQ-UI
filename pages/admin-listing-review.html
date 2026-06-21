@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراجعة القوائم المعلقة | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .expandable-content {
+            display: none;
+            padding: var(--s4);
+            background: var(--bg-main);
+            border-radius: var(--radius-sm);
+            margin-top: var(--s3);
+            border: 1px solid var(--border-color);
+        }
+        .modal {
+            position: fixed;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            padding: var(--s6);
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>طابور مراجعة القوائم (Listing Review Queue)</h1>
+                            <p>تدقيق وقبول عروض الخدمات وسوق السلع المعلقة قبل نشرها للمستخدمين</p>
+                        </div>
+                        <div class="header-actions" style="display:flex; gap:10px;">
+                            <button class="btn btn-outline" id="btn-batch-approve" onclick="batchApproveCleanListings()">موافقة سريعة على القوائم النظيفة (AI ≤ 25) ⚡</button>
+                        </div>
+                    </header>
+
+                    <div class="card animate-on-scroll">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>العنوان والمزود</th>
+                                        <th>القسم</th>
+                                        <th>النوع</th>
+                                        <th>تاريخ التقديم</th>
+                                        <th>مؤشر مخاطر AI</th>
+                                        <th>التوثيق الورقي (OCR)</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listings-table-body">
+                                    <tr><td colspan="7" style="text-align:center; padding: 20px;">جاري تحميل القوائم المعلقة...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Rejection Modal -->
+    <div class="modal" id="reject-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: var(--s4);">سبب رفض نشر القائمة</h3>
+            <form id="reject-form">
+                <input type="hidden" id="reject-listing-id">
+                <div class="form-group">
+                    <label class="form-label">سبب الرفض الرئيسي</label>
+                    <select class="form-input" id="reject-reason" required>
+                        <option value="content_violation">انتهاك سياسة المحتوى (مشاركة أرقام تواصل خارجي)</option>
+                        <option value="pricing_anomaly">شذوذ في الأسعار (مخالف لنسب السوق)</option>
+                        <option value="document_invalid">المستندات الورقية غير صالحة أو منتهية</option>
+                        <option value="poor_images">صور المعدة رديئة أو غير واضحة</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ملاحظة إدارية إضافية للمزود (اختياري)</label>
+                    <textarea class="form-input" id="reject-admin-note" rows="4" placeholder="اكتب تفاصيل الرفض لمساعد المزود على التصحيح..."></textarea>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="closeRejectModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" style="background:var(--danger); box-shadow:none;">تأكيد الرفض ❌</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let listingsData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadListings();
+        });
+
+        async function loadListings() {
+            try {
+                listingsData = await window.API.getAdminListings();
+                renderTable();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل القوائم المعلقة', 'danger');
+            }
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('listings-table-body');
+            tableBody.innerHTML = '';
+            
+            if (listingsData.length > 0) {
+                listingsData.forEach(lst => {
+                    const tr = document.createElement('tr');
+                    tr.id = `listing-row-${lst.id}`;
+                    
+                    const isService = lst.type === 'Service';
+                    const priceLabel = isService ? `${lst.hourly_rate} ريال/ساعة` : `${lst.price} ريال`;
+                    
+                    tr.innerHTML = `
+                        <td>
+                            <div>
+                                <strong>${lst.title}</strong>
+                                <div class="text-muted" style="font-size:var(--text-xs); margin-top:2px;">
+                                    المزود: ${lst.provider_name} | السعر: ${priceLabel}
+                                </div>
+                            </div>
+                        </td>
+                        <td>${lst.category_name}</td>
+                        <td><span class="badge ${isService ? 'badge-info' : 'badge-success'}">${isService ? 'تأجير خدمة' : 'شراء من السوق'}</span></td>
+                        <td>${lst.submitted_date}</td>
+                        <td>
+                            <span class="badge ${lst.ai_risk_badge_class}" style="cursor:pointer;" onclick="toggleRiskReport('${lst.id}')">
+                                ${lst.ai_risk_level} (${lst.ai_risk_score}%) 🔍
+                            </span>
+                            <div class="expandable-content" id="report-${lst.id}">
+                                <strong>تقرير المشرف الآلي (AI):</strong>
+                                <p style="font-size:var(--text-xs); margin-top:5px; line-height:1.4;">${lst.ai_risk_report}</p>
+                                
+                                <div style="margin-top:10px; border-top: 1px dashed var(--border-color); padding-top:10px;">
+                                    <strong>الأسعار المماثلة المعتمدة في السوق:</strong>
+                                    <ul style="font-size:var(--text-xs); margin-top:5px; padding-right:15px; list-style-type:circle;">
+                                        ${lst.similar_listings.map(sim => `<li>${sim.title} (سعر: ${sim.price} ريال - ${sim.provider})</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:var(--text-xs);">
+                                <strong>${lst.document_verification.document_type}</strong>
+                                <div class="text-muted" style="margin-top:2px;">
+                                    حالة الفحص: <span style="font-weight:700;">${lst.document_verification.status_ar}</span> | نسبة الثقة: ${lst.document_verification.ocr_confidence}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:5px;">
+                                <button class="btn btn-primary" style="padding:4px 8px; font-size:var(--text-xs);" onclick="approveListing('${lst.id}')">قبول 👍</button>
+                                <button class="btn btn-outline" style="padding:4px 8px; font-size:var(--text-xs); border-color:var(--danger); color:var(--danger);" onclick="openRejectModal('${lst.id}')">رفض ❌</button>
+                                <button class="btn btn-outline" style="padding:4px 8px; font-size:var(--text-xs);" onclick="requestInfo('${lst.id}')">توضيح 💬</button>
+                                <button class="btn btn-outline" style="padding:4px 8px; font-size:var(--text-xs);" title="إعادة تشغيل فحص الـ AI" onclick="reModerate('${lst.id}')">🔄</button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">لا يوجد قوائم معلقة حالياً للتنقيح والمراجعة.</td></tr>';
+            }
+        }
+
+        function toggleRiskReport(id) {
+            const reportEl = document.getElementById(`report-${id}`);
+            if (reportEl.style.display === 'block') {
+                reportEl.style.display = 'none';
+            } else {
+                reportEl.style.display = 'block';
+            }
+        }
+
+        function approveListing(id) {
+            window.showToast(`تمت الموافقة على القائمة ${id} ونشرها بنجاح.`);
+            listingsData = listingsData.filter(lst => lst.id !== id);
+            renderTable();
+        }
+
+        function openRejectModal(id) {
+            document.getElementById('reject-listing-id').value = id;
+            document.getElementById('reject-admin-note').value = '';
+            document.getElementById('reject-modal').classList.add('show');
+        }
+
+        function closeRejectModal() {
+            document.getElementById('reject-modal').classList.remove('show');
+        }
+
+        document.getElementById('reject-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('reject-listing-id').value;
+            const reason = document.getElementById('reject-reason').value;
+            const note = document.getElementById('reject-admin-note').value;
+            
+            window.showToast(`تم رفض القائمة ${id} وإرسال إشعار للمزود بالسبب.`, 'danger');
+            listingsData = listingsData.filter(lst => lst.id !== id);
+            renderTable();
+            closeRejectModal();
+        });
+
+        function requestInfo(id) {
+            window.showToast(`تم إرسال طلب للمزود لتوفير معلومات ومستندات إضافية حول القائمة ${id}.`);
+        }
+
+        function reModerate(id) {
+            window.showToast(`تمت جدولة إعادة فحص الـ AI للقائمة ${id} بنجاح. سيتم تحديث النتائج خلال دقائق.`);
+        }
+
+        function batchApproveCleanListings() {
+            const cleanListings = listingsData.filter(lst => lst.ai_risk_score <= 25);
+            if (cleanListings.length === 0) {
+                window.showToast('لا توجد قوائم نظيفة (AI ≤ 25) حالياً في الانتظار لتطبيق القبول الجماعي.', 'warning');
+                return;
+            }
+            
+            if (confirm(`هل أنت متأكد من رغبتك في الموافقة الفورية والقبول الجماعي لعدد ${cleanListings.length} قائمة آمنة بنسبة مخاطرة منخفضة؟`)) {
+                cleanListings.forEach(lst => {
+                    window.showToast(`قبول آلي للمعدات: ${lst.title}`);
+                });
+                listingsData = listingsData.filter(lst => lst.ai_risk_score > 25);
+                renderTable();
+            }
+        }
+    </script>
+</body>
+</html>

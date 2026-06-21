@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توثيق الحساب التجاري للهوية | شير جير (مزود)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .verification-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: var(--s5);
+        }
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            padding: var(--s5);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-card);
+            margin-bottom: var(--s4);
+        }
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(244, 163, 0, 0.02);
+        }
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--s2);
+            display: block;
+        }
+        .status-tracker {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: var(--s5);
+            border-radius: var(--radius);
+            margin-bottom: var(--s5);
+        }
+        .preview-img {
+            max-width: 100%;
+            height: 120px;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            margin-top: var(--s2);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <div class="verification-wrapper">
+                        <header class="page-header text-center animate-on-scroll">
+                            <div class="section-title">
+                                <h1>توثيق المنشأة ومزود الخدمة 🔒</h1>
+                                <p style="color:var(--text-muted); margin-top:5px;">يرجى رفع الوثائق والهوية الوطنية للمالك بالإضافة إلى السجل التجاري لتنشيط حساب مزود الخدمة الخاص بك وإمكانية تأجير وبيع المعدات.</p>
+                            </div>
+                        </header>
+
+                        <!-- Status tracker -->
+                        <div class="status-tracker animate-on-scroll">
+                            <h3 style="margin-bottom:10px;">حالة مستندات المنشأة (Documents Status)</h3>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>حالة الفحص والمطابقة:</span>
+                                <span class="badge badge-warning" id="doc-status-badge">غير مرفوع (Not Uploaded)</span>
+                            </div>
+                            <p class="text-muted" style="font-size:var(--text-xs); margin-top:5px;" id="status-desc">يرجى رفع وثائق الهوية الوطنية والسجل التجاري لبدء الفحص التلقائي.</p>
+                        </div>
+
+                        <!-- Upload zones -->
+                        <div class="animate-on-scroll" id="upload-panel">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                                <div class="upload-zone" onclick="triggerUpload('front')">
+                                    <span class="upload-icon">🪪</span>
+                                    <strong>الوجه الأمامي للهوية</strong>
+                                    <input type="file" id="input-front" style="display:none;" onchange="handleFile('front', this)">
+                                    <img id="preview-front" class="preview-img" alt="Front Preview">
+                                </div>
+
+                                <div class="upload-zone" onclick="triggerUpload('back')">
+                                    <span class="upload-icon">💳</span>
+                                    <strong>الوجه الخلفي للهوية</strong>
+                                    <input type="file" id="input-back" style="display:none;" onchange="handleFile('back', this)">
+                                    <img id="preview-back" class="preview-img" alt="Back Preview">
+                                </div>
+                            </div>
+
+                            <div class="upload-zone" onclick="triggerUpload('commercial')">
+                                <span class="upload-icon">📄</span>
+                                <strong>رفع السجل التجاري أو رخصة العمل (إختياري)</strong>
+                                <span class="text-muted" style="display:block; font-size:var(--text-xs); margin-top:5px;">ملف PDF أو صورة الترخيص التجاري المعتمد</span>
+                                <input type="file" id="input-commercial" style="display:none;" onchange="handleFile('commercial', this)">
+                                <img id="preview-commercial" class="preview-img" alt="Commercial Preview">
+                            </div>
+
+                            <button class="btn btn-primary w-full" style="padding:15px;" id="btn-submit" onclick="submitDocs()" disabled>تقديم مستندات المنشأة والمطابقة ⚡</button>
+                        </div>
+
+                        <!-- Simulation and bypass panel -->
+                        <div class="card animate-on-scroll" style="margin-top:var(--s6); border-color:var(--primary); background:rgba(244,163,0,0.02);">
+                            <h4 style="color:var(--primary); margin-bottom:10px;">🧪 لوحة محاكاة عمليات التحقق والموافقة (QA Testing)</h4>
+                            <p style="font-size:var(--text-xs); margin-bottom:15px;">استخدم أزرار المحاكاة لتجربة الحالات المختلفة لردود الـ AI والإشراف الإداري لمزودي الخدمة.</p>
+                            
+                            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:15px;">
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px;" onclick="simulateAI('AiApproved')">👍 محاكاة قبول الـ AI</button>
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px; border-color:var(--warning); color:var(--warning);" onclick="simulateAI('AiWarning')">⚠️ محاكاة تحذير الـ AI</button>
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px; border-color:var(--danger); color:var(--danger);" onclick="simulateAI('AiRejected')">❌ محاكاة رفض الـ AI</button>
+                                <button class="btn btn-outline" style="font-size:var(--text-xs); padding:8px; border-color:var(--success); color:var(--success);" onclick="simulateAdminApproval()">👑 موافقة إدارية كاملة</button>
+                            </div>
+
+                            <button class="btn btn-primary w-full" style="background:var(--dark); box-shadow:none; padding:12px;" onclick="bypassVerification()">
+                                تجاوز والذهاب للوحة التحكم (مستند موثق) 🚪
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let fileFront = null;
+        let fileBack = null;
+        let fileCommercial = null;
+
+        function triggerUpload(side) {
+            document.getElementById('input-' + side).click();
+        }
+
+        function handleFile(side, input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (side === 'front') fileFront = file;
+                else if (side === 'back') fileBack = file;
+                else fileCommercial = file;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview-' + side);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+
+                window.showToast(`تم تحميل ملف ${side === 'commercial' ? 'السجل التجاري' : side === 'front' ? 'الوجه الأمامي' : 'الوجه الخلفي'} بنجاح.`);
+                
+                // Enable submit button if both ID sides uploaded
+                if (fileFront && fileBack) {
+                    document.getElementById('btn-submit').removeAttribute('disabled');
+                }
+            }
+        }
+
+        async function submitDocs() {
+            try {
+                const statusBadge = document.getElementById('doc-status-badge');
+                statusBadge.innerText = 'جاري إرسال الوثائق...';
+                statusBadge.className = 'badge badge-info';
+                
+                // Simulate delay
+                setTimeout(() => {
+                    localStorage.setItem('verified_uploaded_provider', 'true');
+                    localStorage.setItem('verified_ai_status_provider', 'AiPending');
+                    
+                    statusBadge.innerText = 'قيد مراجعة الـ AI (AI Review Pending)';
+                    statusBadge.className = 'badge badge-warning';
+                    document.getElementById('status-desc').innerText = 'تم رفع مستندات الهوية والسجل التجاري بنجاح. محرك التدقيق (OCR + AI Vision) يقوم بمطابقة السجلات وتوثيق التراخيص التجارية.';
+                    
+                    window.showToast('تم رفع وثائق المنشأة بنجاح وجاري فحص الـ AI.');
+                }, 1000);
+            } catch (err) {
+                console.error(err);
+                window.showToast('خطأ أثناء تقديم وثائق المنشأة', 'danger');
+            }
+        }
+
+        function simulateAI(status) {
+            localStorage.setItem('verified_ai_status_provider', status);
+            const badge = document.getElementById('doc-status-badge');
+            const desc = document.getElementById('status-desc');
+
+            if (status === 'AiApproved') {
+                badge.innerText = 'مقبول آلياً (AI Approved)';
+                badge.className = 'badge badge-success';
+                desc.innerText = 'لقد تطابقت الهوية الوطنية والسجل التجاري بنسبة ثقة عالية (96.5%). بانتظار إقرار وتفعيل الإدارة للبدء في نشر معداتك.';
+                window.showToast('فحص الـ AI: الوثائق وسجل السجل التجاري متطابقان.');
+            } else if (status === 'AiWarning') {
+                badge.innerText = 'تحذير آلي (AI Warning)';
+                badge.className = 'badge badge-warning';
+                desc.innerText = 'تنبيه: تم رصد عدم تطابق في عنوان السجل التجاري والمنشأة. سيتم تدقيق المستند يدوياً من الإدارة للتأكد.';
+                window.showToast('فحص الـ AI: تم رصد تحذير تباين العناوين الجغرافية للمؤسسة.', 'warning');
+            } else if (status === 'AiRejected') {
+                badge.innerText = 'مرفوض آلياً (AI Rejected)';
+                badge.className = 'badge badge-danger';
+                desc.innerText = 'تم رفض المستندات التجارية لمزود الخدمة آلياً نظراً لرصد انتهاء صلاحية الترخيص أو السجل التجاري.';
+                window.showToast('فحص الـ AI: السجل التجاري منتهي الصلاحية.', 'danger');
+            }
+        }
+
+        function simulateAdminApproval() {
+            localStorage.setItem('isVerified_provider', 'true');
+            localStorage.setItem('verified_ai_status_provider', 'AdminApproved');
+            
+            const badge = document.getElementById('doc-status-badge');
+            badge.innerText = 'موثق ومعتمد من الإدارة (Admin Approved)';
+            badge.className = 'badge badge-success';
+            document.getElementById('status-desc').innerText = 'تم اعتماد حسابك التجاري كشركة/مزود خدمة موثق بالمنصة بالكامل. يمكنك الآن تنزيل معداتك في لوحة التحكم وتأجيرها.';
+            
+            window.showToast('تهانينا! تم تفعيل وتوثيق حساب المنشأة بنجاح.');
+            
+            setTimeout(() => {
+                window.navigateTo('provider-dashboard.html');
+            }, 2000);
+        }
+
+        function bypassVerification() {
+            localStorage.setItem('isVerified_provider', 'true');
+            window.showToast('محاكاة: تم توثيق حساب المزود والذهاب للوحة التحكم.');
+            window.navigateTo('provider-dashboard.html');
+        }
+    </script>
+</body>
+</html>

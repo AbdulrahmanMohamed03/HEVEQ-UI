@@ -1,0 +1,91 @@
+{
+  "metrics": {
+    "total_reviewed_today": 128,
+    "total_reviewed_week": 845,
+    "total_reviewed_month": 3412,
+    "approval_rate": 88.5,
+    "rejection_rate": 11.5,
+    "false_positive_rate": 1.8,
+    "average_processing_time_ms": 285
+  },
+  "provider_risks": [
+    {
+      "provider_name": "مؤسسة الحربي لتأجير المولدات",
+      "risk_score": 78,
+      "risk_level": "HIGH",
+      "reasons": "تكرار إلغاء الحجوزات ونسب استجابة متدنية"
+    },
+    {
+      "provider_name": "شركة الجزيرة للمعدات الثقيلة",
+      "risk_score": 42,
+      "risk_level": "MEDIUM",
+      "reasons": "تغيير متكرر بالأسعار ومطابقة صور منخفضة"
+    },
+    {
+      "provider_name": "المقاولون العرب",
+      "risk_score": 12,
+      "risk_level": "LOW",
+      "reasons": "سلوك مالي وتشغيلي مستقر"
+    }
+  ],
+  "ai_interaction_logs": [
+    {
+      "id": "AILOG-0001",
+      "agent_type": "Moderator",
+      "agent_type_ar": "المشرف الآلي (Moderator)",
+      "entity_type": "ServiceListing",
+      "entity_type_ar": "عرض الخدمة",
+      "entity_id": "LST-902",
+      "ai_recommendation": "Reject (Blacklist Word)",
+      "ai_risk_score": 85,
+      "admin_override": "None",
+      "admin_override_by": null,
+      "latency_ms": 240,
+      "input_tokens": 1200,
+      "output_tokens": 150,
+      "created_at": "2026-06-21T15:45:00Z"
+    },
+    {
+      "id": "AILOG-0002",
+      "agent_type": "Vision",
+      "agent_type_ar": "الرؤية الحاسوبية (Vision)",
+      "entity_type": "JobCompletionEvidence",
+      "entity_type_ar": "إثبات التنفيذ",
+      "entity_id": "EV-3301",
+      "ai_recommendation": "Approve (High Similarity)",
+      "ai_risk_score": 5,
+      "admin_override": "Approved (Manual Overrule)",
+      "admin_override_by": "عبد الرحمن الرشيد",
+      "latency_ms": 820,
+      "input_tokens": 4200,
+      "output_tokens": 300,
+      "created_at": "2026-06-21T14:30:00Z"
+    },
+    {
+      "id": "AILOG-0003",
+      "agent_type": "OCR",
+      "agent_type_ar": "التعرف على النصوص (OCR)",
+      "entity_type": "Document",
+      "entity_type_ar": "مستند ترخيص المشغل",
+      "entity_id": "DOC-401",
+      "ai_recommendation": "Reject (Expired Date)",
+      "ai_risk_score": 90,
+      "admin_override": "None",
+      "admin_override_by": null,
+      "latency_ms": 310,
+      "input_tokens": 850,
+      "output_tokens": 90,
+      "created_at": "2026-06-21T13:10:00Z"
+    }
+  ],
+  "configuration": {
+    "semantic_search_similarity_threshold": 75,
+    "provider_response_sla_duration_hours": 2,
+    "customer_auto_confirmation_window_days": 3,
+    "price_anomaly_low_outlier_pct": 20,
+    "price_anomaly_high_outlier_pct": 250,
+    "risk_score_band_low_limit": 25,
+    "risk_score_band_high_limit": 75,
+    "blacklist": "احتيال, بيع خارجي, كاش, رصيد وهمي, تواصل واتساب"
+  }
+}

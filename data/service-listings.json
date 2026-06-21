@@ -1,0 +1,44 @@
+[
+  {
+    "id": "SRV-2001",
+    "title": "تأجير ونش تادانو تلسكوبي 50 طن",
+    "provider_company": "المقاولون العرب",
+    "hourly_rate": 850,
+    "daily_rate": 6800,
+    "equipment_model": "تادانو ATF-50",
+    "equipment_capacity": "50 طن",
+    "service_zone": "جدة والمنطقة الغربية (شعاع 100 كم)",
+    "availability_ar": "السبت - الخميس (07:00 ص - 06:00 م)",
+    "operator_summary": "يشمل مشغل معتمد مرخص فئة ثقيلة وتأمين شامل للموقع",
+    "image": "https://images.unsplash.com/photo-1541625602330-2277a4c4b282?auto=format&fit=crop&w=400&q=80",
+    "location": "جدة"
+  },
+  {
+    "id": "SRV-2002",
+    "title": "تأجير جرافة كاتربيلر D9 للأعمال الإنشائية",
+    "provider_company": "شركة السويدي للخدمات الصناعية",
+    "hourly_rate": 950,
+    "daily_rate": 7600,
+    "equipment_model": "Caterpillar D9T",
+    "equipment_capacity": "شفرة تسوية عملاقة",
+    "service_zone": "الرياض والمنطقة الوسطى (شعاع 150 كم)",
+    "availability_ar": "طوال أيام الأسبوع (دعم ميداني 24 ساعة)",
+    "operator_summary": "يشمل فني صيانة مقيم بالموقع لمشاريع الحفر الطويلة",
+    "image": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=400&q=80",
+    "location": "الرياض"
+  },
+  {
+    "id": "SRV-2003",
+    "title": "تأجير مولد كهرباء صامت 500 كيلوواط للشركات والمصانع",
+    "provider_company": "شركة السويدي للإلكترونيات",
+    "hourly_rate": 350,
+    "daily_rate": 2800,
+    "equipment_model": "CAT-500KVA الصامت",
+    "equipment_capacity": "500 كيلوواط",
+    "service_zone": "الشرقية والمنطقة الوسطى",
+    "availability_ar": "تشغيل متواصل 24/7",
+    "operator_summary": "يشمل التوصيل والتركيب وكابلات بطول 50 متر مجاناً",
+    "image": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=600&q=80",
+    "location": "الدمام"
+  }
+]

@@ -43,6 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (isProtected && !window.isAuthenticated()) {
         window.navigateTo('login.html');
+    } else if (window.isAuthenticated()) {
+        const role = localStorage.getItem('userRole');
+        if (role === 'customer' || role === 'provider') {
+            const isVerified = localStorage.getItem('isVerified_' + role) === 'true';
+            const verificationPages = ['customer-verification.html', 'provider-verification.html'];
+            if (!isVerified && !verificationPages.includes(currentPath) && currentPath !== 'login.html') {
+                if (role === 'provider') {
+                    window.navigateTo('provider-verification.html');
+                } else {
+                    window.navigateTo('customer-verification.html');
+                }
+            }
+        }
     }
 });
 
@@ -56,10 +69,23 @@ window.login = (role = 'customer') => {
     localStorage.setItem('userRole', role);
     localStorage.setItem('sg_token', 'mock_token_' + Date.now());
     
-    if (role === 'provider') {
-        window.navigateTo('provider-dashboard.html');
+    if (role === 'admin') {
+        window.navigateTo('admin.html');
     } else {
-        window.navigateTo('dashboard.html');
+        const isVerified = localStorage.getItem('isVerified_' + role) === 'true';
+        if (!isVerified) {
+            if (role === 'provider') {
+                window.navigateTo('provider-verification.html');
+            } else {
+                window.navigateTo('customer-verification.html');
+            }
+        } else {
+            if (role === 'provider') {
+                window.navigateTo('provider-dashboard.html');
+            } else {
+                window.navigateTo('dashboard.html');
+            }
+        }
     }
 };
 

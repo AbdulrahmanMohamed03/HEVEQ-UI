@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تذاكر الدعم والنزاعات | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            visibility: hidden;
+            opacity: 0;
+            z-index: 2999;
+            transition: var(--transition);
+        }
+        .drawer-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .details-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 550px;
+            max-width: 100%;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            transform: translateX(-100%);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            padding: var(--s5);
+            overflow-y: auto;
+        }
+        .details-drawer.show {
+            transform: translateX(0);
+        }
+
+        .filter-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--s3);
+            margin-bottom: var(--s5);
+        }
+
+        /* Message thread styling */
+        .chat-thread {
+            display: flex;
+            flex-direction: column;
+            gap: var(--s3);
+            margin: var(--s4) 0;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            padding: var(--s3);
+            border-radius: var(--radius-sm);
+            background: var(--bg-main);
+        }
+        .chat-msg {
+            padding: var(--s3);
+            border-radius: var(--radius-sm);
+            max-width: 85%;
+            font-size: var(--text-sm);
+        }
+        .msg-customer { background: #E0F2FE; color: #0369A1; align-self: flex-start; }
+        .msg-provider { background: #FEF3C7; color: #B45309; align-self: flex-start; }
+        .msg-admin { background: #D1FAE5; color: #065F46; align-self: flex-end; }
+        .msg-internal { background: #F3F4F6; border-right: 3px solid var(--text-muted); color: var(--text-main); align-self: flex-end; }
+
+        .ai-report-box {
+            background: rgba(244, 163, 0, 0.05);
+            border: 1px solid rgba(244, 163, 0, 0.15);
+            padding: var(--s4);
+            border-radius: var(--radius-sm);
+            margin: var(--s4) 0;
+            font-size: var(--text-xs);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>مركز الدعم الفني وتذاكر النزاعات (Tickets & Disputes)</h1>
+                            <p>حل النزاعات والشكاوى، ومتابعة الالتزام باتفاقية الـ SLA للأطراف والرد الإداري</p>
+                        </div>
+                    </header>
+
+                    <!-- Search and filters -->
+                    <div class="card filter-bar animate-on-scroll">
+                        <div>
+                            <label class="form-label">بحث برقم التذكرة أو الموضوع</label>
+                            <input type="text" class="form-input" id="search-input" placeholder="ابحث..." oninput="filterTickets()">
+                        </div>
+                        <div>
+                            <label class="form-label">حالة التذكرة</label>
+                            <select class="form-input" id="status-filter" onchange="filterTickets()">
+                                <option value="all">الكل</option>
+                                <option value="0">مفتوح (Open)</option>
+                                <option value="1">قيد المتابعة (InProgress)</option>
+                                <option value="2">انتظار رد العميل</option>
+                                <option value="3">انتظار رد المزود</option>
+                                <option value="4">معلق للتحقق الميداني</option>
+                                <option value="5">محلول (Resolved)</option>
+                                <option value="6">مغلق (Closed)</option>
+                                <option value="7">معاد فتحه (Reopened)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">فئة الشكوى</label>
+                            <select class="form-input" id="category-filter" onchange="filterTickets()">
+                                <option value="all">الكل</option>
+                                <option value="0">جودة الخدمة (ServiceQuality)</option>
+                                <option value="1">سلوك المشغل (OperatorConduct)</option>
+                                <option value="2">مشكلة في الدفع (PaymentIssue)</option>
+                                <option value="3">احتيال وأمن (Fraud)</option>
+                                <option value="4">مخاوف السلامة (SafetyConcern)</option>
+                                <option value="5">خلاف إكمال العمل (CompletionDispute)</option>
+                                <option value="6">مشكلة في السوق (MarketplaceIssue)</option>
+                                <option value="7">أخرى (Other)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tickets Table -->
+                    <div class="card animate-on-scroll">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>رقم التذكرة</th>
+                                        <th>الموضوع والمدعي</th>
+                                        <th>الفئة</th>
+                                        <th>الأولوية</th>
+                                        <th>المعين له</th>
+                                        <th>حالة SLA</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tickets-table-body">
+                                    <tr><td colspan="8" style="text-align:center; padding: 20px;">جاري تحميل التذاكر...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Details drawer -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+    <div class="details-drawer" id="details-drawer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--s4); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            <div>
+                <strong style="color:var(--primary);" id="drawer-ticket-number">-</strong>
+                <h4 id="drawer-ticket-subject" style="margin-top:5px;">-</h4>
+            </div>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size:var(--text-xs);" onclick="closeDrawer()">إغلاق ✕</button>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap: var(--s3);">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:var(--text-xs);">
+                <div><strong>مقدم التذكرة:</strong> <span id="drawer-ticket-owner" class="text-muted">-</span></div>
+                <div><strong>الفئة:</strong> <span id="drawer-ticket-cat" class="text-muted">-</span></div>
+                <div><strong>المهلة لرد الإدارة:</strong> <span id="drawer-ticket-deadline" class="badge badge-warning">-</span></div>
+                <div><strong>الحالة الحالية:</strong> <span id="drawer-ticket-status" class="badge badge-info">-</span></div>
+            </div>
+
+            <!-- AI Assessment Box -->
+            <div class="ai-report-box">
+                <strong style="color:var(--primary); display:block; margin-bottom:5px;">🤖 تحليل الذكاء الاصطناعي الأولي (AI summary)</strong>
+                <p><strong>ملخص المشكلة:</strong> <span id="drawer-ai-summary">-</span></p>
+                <p style="margin-top:3px;"><strong>المشكلة المستخلصة:</strong> <span id="drawer-ai-issue">-</span></p>
+                <p style="margin-top:3px;"><strong>الضرر المزعوم:</strong> <span id="drawer-ai-impact">-</span></p>
+                <p style="margin-top:3px;"><strong>أولوية التصعيد المقترحة:</strong> <span id="drawer-ai-priority" style="font-weight:700;">-</span></p>
+            </div>
+
+            <!-- Messages Timeline -->
+            <strong>المراسلات (Ticket Messages):</strong>
+            <div class="chat-thread" id="drawer-chat-thread">
+                <!-- Messages dynamic -->
+            </div>
+
+            <!-- Attachments -->
+            <div id="drawer-attachments-section" style="font-size:var(--text-xs);">
+                <strong>المرفقات (Attachments):</strong>
+                <div id="drawer-attachments-list" style="margin-top:5px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <!-- Attachments dynamic -->
+                </div>
+            </div>
+
+            <!-- Assignee management -->
+            <div style="border-top:1px solid var(--border-color); padding-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group">
+                    <label class="form-label">تعيين التذكرة لموظف</label>
+                    <select class="form-input" id="assign-select" onchange="assignTicket()">
+                        <option value="">اختر موظف...</option>
+                        <option value="USR-0004">سعد الشهراني (ميداني)</option>
+                        <option value="USR-0006">سليمان الخالدي (دعم عملاء)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">تغيير حالة التذكرة</label>
+                    <select class="form-input" id="status-select" onchange="changeTicketStatus()">
+                        <option value="1">قيد المتابعة (InProgress)</option>
+                        <option value="2">تعليق لرد العميل (PendingCustomer)</option>
+                        <option value="3">تعليق لرد المزود (PendingProvider)</option>
+                        <option value="6">مغلقة (Closed)</option>
+                        <option value="7">إعادة فتح (Reopened)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Chat input for replies -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
+                <label class="form-label">إضافة رد أو ملاحظة إشرافية</label>
+                <textarea class="form-input" id="reply-textarea" rows="2" placeholder="اكتب الرد هنا..."></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                    <label style="font-size:var(--text-xs); cursor:pointer;">
+                        <input type="checkbox" id="reply-internal-check"> ملاحظة داخلية فقط (لا يراها العميل)
+                    </label>
+                    <button class="btn btn-primary" style="padding:4px 12px; font-size:var(--text-xs);" onclick="sendTicketReply()">إرسال ✉️</button>
+                </div>
+            </div>
+
+            <!-- Financial Resolution -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 10px; background: rgba(0,0,0,0.01); padding: 10px; border-radius: 8px;">
+                <strong>قرار الحل النهائي للنزاع المالي (Resolution):</strong>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:5px;">
+                    <select class="form-input" id="resolution-select">
+                        <option value="0">استرداد كامل للعميل (FullRefundToCustomer)</option>
+                        <option value="1">تحرير كامل للمزود (FullReleaseToProvider)</option>
+                        <option value="2">تسوية جزئية للطرفين (PartialSettlement)</option>
+                        <option value="3">إعادة الخدمة مجاناً (ServiceRedo)</option>
+                        <option value="4">لا يتطلب إجراء (NoActionRequired)</option>
+                        <option value="5">التصعيد للتحقق الميداني (EscalateToFieldVerification)</option>
+                    </select>
+                    <button class="btn btn-primary" style="background:var(--success); box-shadow:none;" onclick="resolveTicket()">اعتماد القرار ⚖️</button>
+                </div>
+                <div id="field-dispatch-link-container" style="display:none; margin-top:10px; text-align:center;">
+                    <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary); width:100%;" onclick="goToFieldVerification()">
+                        توزيع فحص ميداني فوري ⚡
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let ticketsData = [];
+        let filteredTickets = [];
+        let selectedTicketId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadTickets();
+        });
+
+        async function loadTickets() {
+            try {
+                ticketsData = await window.API.getAdminTickets();
+                filteredTickets = [...ticketsData];
+                renderTicketsTable();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل تذاكر الدعم والنزاعات', 'danger');
+            }
+        }
+
+        function renderTicketsTable() {
+            const tableBody = document.getElementById('tickets-table-body');
+            tableBody.innerHTML = '';
+
+            if (filteredTickets.length > 0) {
+                filteredTickets.forEach(tck => {
+                    const tr = document.createElement('tr');
+                    
+                    let priorityBadge = 'badge-info';
+                    if (tck.priority === 2) priorityBadge = 'badge-warning';
+                    if (tck.priority === 3) priorityBadge = 'badge-danger';
+                    
+                    let statusBadge = 'badge-info';
+                    if (tck.status === 5 || tck.status === 6) statusBadge = 'badge-success';
+                    if (tck.status === 0) statusBadge = 'badge-danger';
+
+                    tr.innerHTML = `
+                        <td><strong>#${tck.ticket_number}</strong></td>
+                        <td>
+                            <div>
+                                <strong>${tck.subject}</strong>
+                                <div class="text-muted" style="font-size:var(--text-xs); margin-top:2px;">
+                                    المدعي: ${tck.submitted_by_name} | معرف الحجز: ${tck.booking_id || 'لا يوجد'}
+                                </div>
+                            </div>
+                        </td>
+                        <td>${tck.category_ar}</td>
+                        <td><span class="badge ${priorityBadge}">${tck.priority_ar}</span></td>
+                        <td>${tck.assigned_to_name}</td>
+                        <td>
+                            <span class="badge ${tck.sla_badge_class}">${tck.sla_message}</span>
+                        </td>
+                        <td><span class="badge ${statusBadge}">${tck.status_ar}</span></td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size:var(--text-xs);" onclick="openDrawer('${tck.id}')">
+                                عرض وحل ⚖️
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">لا يوجد تذاكر تطابق خيارات التصفية.</td></tr>';
+            }
+        }
+
+        function filterTickets() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('status-filter').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            filteredTickets = ticketsData.filter(tck => {
+                const numMatch = tck.ticket_number.toLowerCase().includes(query);
+                const subjMatch = tck.subject.toLowerCase().includes(query);
+                const textMatch = numMatch || subjMatch;
+
+                let statusMatch = true;
+                if (statusFilter !== 'all') {
+                    statusMatch = tck.status === parseInt(statusFilter);
+                }
+
+                let catMatch = true;
+                if (categoryFilter !== 'all') {
+                    catMatch = tck.category === parseInt(categoryFilter);
+                }
+
+                return textMatch && statusMatch && catMatch;
+            });
+
+            renderTicketsTable();
+        }
+
+        function openDrawer(id) {
+            const tck = ticketsData.find(t => t.id === id);
+            if (!tck) return;
+
+            selectedTicketId = id;
+            document.getElementById('drawer-ticket-number').innerText = `#${tck.ticket_number}`;
+            document.getElementById('drawer-ticket-subject').innerText = tck.subject;
+            document.getElementById('drawer-ticket-owner').innerText = tck.submitted_by_name;
+            document.getElementById('drawer-ticket-cat').innerText = tck.category_ar;
+            
+            const dl = new Date(tck.admin_response_deadline);
+            document.getElementById('drawer-ticket-deadline').innerText = dl.toLocaleTimeString('ar-SA') + ' - ' + dl.toLocaleDateString('ar-SA');
+            document.getElementById('drawer-ticket-status').innerText = tck.status_ar;
+
+            // AI details
+            document.getElementById('drawer-ai-summary').innerText = tck.ai_summary;
+            document.getElementById('drawer-ai-issue').innerText = tck.ai_identified_issue;
+            document.getElementById('drawer-ai-impact').innerText = tck.ai_claimed_impact;
+            
+            const prioNames = ["منخفضة", "متوسطة", "مرتفعة", "حرجة"];
+            document.getElementById('drawer-ai-priority').innerText = prioNames[tck.ai_escalation_priority];
+
+            // Render Messages
+            const chatThread = document.getElementById('drawer-chat-thread');
+            chatThread.innerHTML = '';
+            if (tck.messages && tck.messages.length > 0) {
+                tck.messages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    let bubbleClass = 'msg-internal';
+                    if (msg.sender_role === 'Customer') bubbleClass = 'msg-customer';
+                    else if (msg.sender_role === 'Provider') bubbleClass = 'msg-provider';
+                    else if (msg.sender_role === 'Admin' && !msg.is_internal) bubbleClass = 'msg-admin';
+                    
+                    msgDiv.className = `chat-msg ${bubbleClass}`;
+                    msgDiv.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; margin-bottom:3px; opacity:0.8;">
+                            <span>${msg.sender_name} (${msg.sender_role}${msg.is_internal ? ' - ملاحظة داخلية' : ''})</span>
+                            <span>${new Date(msg.created_at).toLocaleTimeString('ar-SA')}</span>
+                        </div>
+                        <div>${msg.body}</div>
+                    `;
+                    chatThread.appendChild(msgDiv);
+                });
+                // Auto scroll to bottom
+                chatThread.scrollTop = chatThread.scrollHeight;
+            }
+
+            // Render attachments
+            const attachSection = document.getElementById('drawer-attachments-section');
+            const attachList = document.getElementById('drawer-attachments-list');
+            attachList.innerHTML = '';
+            if (tck.attachments && tck.attachments.length > 0) {
+                attachSection.style.display = 'block';
+                tck.attachments.forEach(att => {
+                    const card = document.createElement('div');
+                    card.style.cssText = 'padding:8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-main); cursor:pointer;';
+                    card.onclick = () => window.showToast(`تحميل الملف: ${att.file_name}`);
+                    card.innerHTML = `
+                        <strong>📎 ${att.file_name}</strong>
+                        <div style="color:var(--text-muted); font-size:9px; margin-top:2px;">${att.file_type}</div>
+                    `;
+                    attachList.appendChild(card);
+                });
+            } else {
+                attachSection.style.display = 'none';
+            }
+
+            // Setup inputs
+            document.getElementById('assign-select').value = tck.assigned_to_id || '';
+            document.getElementById('status-select').value = tck.status;
+            document.getElementById('reply-textarea').value = '';
+            document.getElementById('reply-internal-check').checked = false;
+            
+            // Check dispatch container
+            document.getElementById('field-dispatch-link-container').style.display = 'none';
+
+            document.getElementById('drawer-overlay').classList.add('show');
+            document.getElementById('details-drawer').classList.add('show');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer-overlay').classList.remove('show');
+            document.getElementById('details-drawer').classList.remove('show');
+            selectedTicketId = null;
+        }
+
+        function assignTicket() {
+            const select = document.getElementById('assign-select');
+            const empName = select.options[select.selectedIndex].text;
+            const tck = ticketsData.find(t => t.id === selectedTicketId);
+            if (!tck) return;
+
+            tck.assigned_to_id = select.value;
+            tck.assigned_to_name = select.value ? empName : 'غير معين';
+            
+            window.showToast(`تم تعيين التذكرة بنجاح للموظف: ${tck.assigned_to_name}`);
+            filterTickets();
+        }
+
+        function changeTicketStatus() {
+            const select = document.getElementById('status-select');
+            const statusVal = parseInt(select.value);
+            const statusText = select.options[select.selectedIndex].text;
+            
+            const tck = ticketsData.find(t => t.id === selectedTicketId);
+            if (!tck) return;
+
+            tck.status = statusVal;
+            tck.status_ar = statusText;
+            
+            window.showToast(`تم تغيير حالة التذكرة لتكون: ${statusText}`);
+            document.getElementById('drawer-ticket-status').innerText = statusText;
+            filterTickets();
+        }
+
+        function sendTicketReply() {
+            const text = document.getElementById('reply-textarea').value.trim();
+            if (!text) {
+                window.showToast('الرجاء كتابة رد أولاً', 'warning');
+                return;
+            }
+            
+            const isInternal = document.getElementById('reply-internal-check').checked;
+            const tck = ticketsData.find(t => t.id === selectedTicketId);
+            if (!tck) return;
+
+            const newMsg = {
+                "id": "MSG-" + Date.now(),
+                "sender_id": "USR-0003",
+                "sender_name": "عبد الرحمن الرشيد",
+                "sender_role": "Admin",
+                "body": text,
+                "is_internal": isInternal,
+                "created_at": new Date().toISOString()
+            };
+
+            tck.messages.push(newMsg);
+            
+            window.showToast(isInternal ? 'تم حفظ الملاحظة الداخلية بنجاح' : 'تم إرسال الرد للعميل');
+            openDrawer(selectedTicketId); // refresh
+        }
+
+        function resolveTicket() {
+            const select = document.getElementById('resolution-select');
+            const resVal = select.value;
+            const resText = select.options[select.selectedIndex].text;
+            
+            const tck = ticketsData.find(t => t.id === selectedTicketId);
+            if (!tck) return;
+
+            tck.status = 5; // Resolved
+            tck.status_ar = "محلول (Resolved)";
+            
+            window.showToast(`تم اعتماد قرار النزاع بنجاح: ${resText}`);
+            document.getElementById('drawer-ticket-status').innerText = tck.status_ar;
+            
+            if (resVal === '5') { // EscalatedToFieldVerification
+                document.getElementById('field-dispatch-link-container').style.display = 'block';
+            } else {
+                document.getElementById('field-dispatch-link-container').style.display = 'none';
+            }
+            
+            filterTickets();
+        }
+
+        function goToFieldVerification() {
+            const tck = ticketsData.find(t => t.id === selectedTicketId);
+            if (!tck) return;
+            closeDrawer();
+            window.navigateTo(`admin-field-verification.html?booking_id=${tck.booking_id}&evidence_form_id=EV-3301`);
+        }
+    </script>
+</body>
+</html>

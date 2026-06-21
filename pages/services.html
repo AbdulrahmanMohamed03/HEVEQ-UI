@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سوق المعدات والقطع | شير جير</title>
+    <title>تأجير المعدات الثقيلة | شير جير</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/layouts.css">
     <style>
-        .marketplace-hero { background: var(--dark); color: white; padding: var(--s8) 0; border-radius: var(--radius-lg); margin-bottom: var(--s10); text-align: center; }
-        .marketplace-hero h1 { font-size: 2.5rem; margin-bottom: var(--s4); }
-        .marketplace-hero p { opacity: 0.8; margin-bottom: var(--s6); }
+        .services-hero { background: var(--dark); color: white; padding: var(--s8) 0; border-radius: var(--radius-lg); margin-bottom: var(--s10); text-align: center; }
+        .services-hero h1 { font-size: 2.5rem; margin-bottom: var(--s4); }
+        .services-hero p { opacity: 0.8; margin-bottom: var(--s6); }
 
-        /* Scoped Grid and Card CSS */
-        .marketplace-grid {
+        /* Scoped Services Grid and Card CSS */
+        .services-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: var(--s6);
         }
         @media (max-width: 1024px) {
-            .marketplace-grid {
+            .services-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
         @media (max-width: 768px) {
-            .marketplace-grid {
+            .services-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        .marketplace-card {
+        .services-card {
             padding: 0;
             overflow: hidden;
             display: flex;
@@ -42,31 +42,31 @@
             box-shadow: var(--shadow-sm);
             transition: var(--transition);
         }
-        .marketplace-card:hover {
+        .services-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-lg);
         }
 
-        .marketplace-img {
+        .services-img {
             width: 100%;
             height: 200px;
             position: relative;
         }
-        .marketplace-img img {
+        .services-img img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .marketplace-info {
+        .services-info {
             padding: var(--s5);
             display: flex;
             flex-direction: column;
             gap: var(--s2);
             flex-grow: 1;
         }
-        .marketplace-price {
-            font-size: var(--text-xl);
+        .services-rate {
+            font-size: var(--text-lg);
             font-weight: 900;
             color: var(--primary);
         }
@@ -79,14 +79,14 @@
         
         <div class="main-content">
             <app-navbar></app-navbar>
- 
+
             <main class="page-content">
                 <div class="container">
-                    <div class="marketplace-hero animate-on-scroll">
-                        <h1>سوق شير جير المركزي (مبيعات)</h1>
-                        <p>شراء وبيع المعدات الثقيلة المستعملة والجديدة، وقطع الغيار الأصلية</p>
+                    <div class="services-hero animate-on-scroll">
+                        <h1>منصة تأجير المعدات الثقيلة (Rentals)</h1>
+                        <p>احجز معداتك الثقيلة والآليات الإنشائية فوراً مع المشغلين والشركات المعتمدة</p>
                         <div class="nav-search" style="max-width: 600px; margin: 0 auto; display: block;">
-                            <input type="text" placeholder="ابحث عن محركات، هيدروليك، أو معدات للبيع..." style="width: 100%; padding: 15px 45px; border-radius: 99px; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main);">
+                            <input type="text" placeholder="ابحث عن ونش، رافعة، جرافة، أو مولدات للإيجار..." style="width: 100%; padding: 15px 45px; border-radius: 99px; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main);">
                             <span class="search-icon" style="right: 15px;">🔍</span>
                         </div>
                     </div>
@@ -94,26 +94,26 @@
                     <section style="margin-bottom: 80px;">
                         <div class="section-header animate-on-scroll">
                             <div class="section-title">
-                                <h2>تسوق حسب الفئة</h2>
-                                <p>معدات مستعملة للبيع، قطع غيار، ونظام الهيدروليك</p>
+                                <h2>استكشف فئات التأجير</h2>
+                                <p>آليات الرفع، تسوية التربة، وحلول الطاقة الكهربائية</p>
                             </div>
                         </div>
                         <div class="categories-grid">
                             <div class="category-card animate-on-scroll">
+                                <span class="category-icon">🏗️</span>
+                                <span class="category-name">رافعات وأوناش</span>
+                            </div>
+                            <div class="category-card animate-on-scroll">
                                 <span class="category-icon">🚜</span>
-                                <span class="category-name">معدات مستعملة</span>
+                                <span class="category-name">حفارات وجرافات</span>
                             </div>
                             <div class="category-card animate-on-scroll">
-                                <span class="category-icon">⚙️</span>
-                                <span class="category-name">قطع غيار</span>
+                                <span class="category-icon">⚡</span>
+                                <span class="category-name">مولدات كهرباء</span>
                             </div>
                             <div class="category-card animate-on-scroll">
-                                <span class="category-icon">🔧</span>
-                                <span class="category-name">نظم هيدروليكية</span>
-                            </div>
-                            <div class="category-card animate-on-scroll">
-                                <span class="category-icon">⭕</span>
-                                <span class="category-name">إطارات وعجلات</span>
+                                <span class="category-icon">🚚</span>
+                                <span class="category-name">شاحنات نقل ثقيل</span>
                             </div>
                         </div>
                     </section>
@@ -121,12 +121,12 @@
                     <section>
                         <div class="section-header animate-on-scroll">
                             <div class="section-title">
-                                <h2>أحدث المعدات والقطع المعروضة للبيع</h2>
-                                <p>صفقات بيع وشراء حصرية للمستخدمين والمقاولين</p>
+                                <h2>المعدات المتاحة للحجز والطلب الفوري</h2>
+                                <p>خدمات تأجير متكاملة مدعومة بفريق المشغلين المرخصين</p>
                             </div>
                         </div>
 
-                        <div id="marketplace-grid" class="marketplace-grid">
+                        <div id="services-grid" class="services-grid">
                             <!-- Skeleton Loaders -->
                             <div class="card skeleton" style="height: 300px;"></div>
                             <div class="card skeleton" style="height: 300px;"></div>
@@ -148,36 +148,41 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const grid = document.getElementById('marketplace-grid');
+            const grid = document.getElementById('services-grid');
             try {
-                const listings = await window.API.getMarketplaceListings();
+                const listings = await window.API.getServiceListings();
                 grid.innerHTML = listings.map(lst => `
-                    <div class="marketplace-card animate-on-scroll">
-                        <div class="marketplace-img">
+                    <div class="services-card animate-on-scroll">
+                        <div class="services-img">
                             <img src="${lst.image}" alt="${lst.title}">
-                            <span class="badge badge-warning" style="position: absolute; top: 15px; right: 15px; font-weight:700;">للبيع</span>
+                            <span class="badge badge-info" style="position: absolute; top: 15px; right: 15px; font-weight:700;">تأجير</span>
                         </div>
-                        <div class="marketplace-info">
-                            <div class="marketplace-price">${lst.price.toLocaleString()} ريال</div>
+                        <div class="services-info">
+                            <div class="services-rate">
+                                <strong>${lst.hourly_rate} ريال/ساعة</strong>
+                                <span style="font-size:var(--text-xs); color:var(--text-muted); font-weight:normal;">(${lst.daily_rate} ريال/يومي)</span>
+                            </div>
                             <h3 style="font-size: var(--text-lg); font-weight:800; margin:5px 0;">${lst.title}</h3>
                             <div style="font-size: var(--text-xs); color: var(--text-muted); display:flex; flex-direction:column; gap:3px; margin-bottom:10px;">
-                                <span>📍 الموقع: ${lst.location} | الحالة: <strong>${lst.condition}</strong></span>
-                                <span>🤝 المعاملة: ${lst.transaction_method}</span>
-                                <span>🔧 المواصفات: ${lst.specs}</span>
-                                <span>👤 البائع: ${lst.seller_name}</span>
+                                <span>🏗️ الموديل: ${lst.equipment_model} | الحمولة/السعة: ${lst.equipment_capacity}</span>
+                                <span>📍 نطاق التغطية: ${lst.service_zone}</span>
+                                <span>🕒 الموثوقية: ${lst.availability_ar}</span>
+                                <span>👤 المشغل: ${lst.operator_summary}</span>
+                                <span>🏢 المزود: ${lst.provider_company}</span>
                             </div>
-                            <button class="btn btn-primary w-full" style="margin-top:auto;" onclick="viewDetails('${lst.id}')">عرض تفاصيل السلعة</button>
+                            <button class="btn btn-primary w-full" style="margin-top:auto;" onclick="bookService('${lst.id}')">طلب وحجز الخدمة 🚜</button>
                         </div>
                     </div>
                 `).join('');
             } catch (error) {
                 console.error(error);
-                grid.innerHTML = '<p class="text-muted">فشل تحميل بيانات سوق المبيعات</p>';
+                grid.innerHTML = '<p class="text-muted">فشل تحميل بيانات تأجير المعدات</p>';
             }
         });
 
-        function viewDetails(id) {
-            window.showToast(`تحويل لصفحة تفاصيل السلعة المعروضة: ${id}`);
+        function bookService(id) {
+            // Simulated redirect to wizard
+            window.navigateTo('booking-wizard.html');
         }
     </script>
 </body>

@@ -65,6 +65,18 @@
                 <p style="color: var(--text-muted);">سجل دخولك للمتابعة في المنصة</p>
             </div>
 
+            <div class="role-selector" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                <div class="role-option active" id="role-customer" onclick="selectRole('customer')" style="padding: 12px; border: 2px solid var(--primary); background: rgba(244, 163, 0, 0.05); border-radius: var(--radius); text-align: center; cursor: pointer; font-weight: 700; font-size: 0.9rem;">
+                    👤 عميل
+                </div>
+                <div class="role-option" id="role-provider" onclick="selectRole('provider')" style="padding: 12px; border: 2px solid var(--border-color); border-radius: var(--radius); text-align: center; cursor: pointer; font-weight: 700; font-size: 0.9rem;">
+                    🏗️ مزود
+                </div>
+                <div class="role-option" id="role-admin" onclick="selectRole('admin')" style="padding: 12px; border: 2px solid var(--border-color); border-radius: var(--radius); text-align: center; cursor: pointer; font-weight: 700; font-size: 0.9rem;">
+                    🛡️ مدير
+                </div>
+            </div>
+
             <form id="login-form">
                 <div class="form-group">
                     <label class="form-label">البريد الإلكتروني أو رقم الهاتف</label>
@@ -97,10 +109,33 @@
     <script src="../js/components/app-sidebar.js"></script>
     <script src="../js/components/app-footer.js"></script>
     <script>
+        let selectedRole = 'customer';
+
+        function selectRole(role) {
+            document.querySelectorAll('.role-option').forEach(opt => {
+                opt.style.borderColor = 'var(--border-color)';
+                opt.style.background = 'none';
+                opt.classList.remove('active');
+            });
+            const el = document.getElementById('role-' + role);
+            if (el) {
+                el.style.borderColor = 'var(--primary)';
+                el.style.background = 'rgba(244, 163, 0, 0.05)';
+                el.classList.add('active');
+            }
+            selectedRole = role;
+        }
+
+        // Initialize role based on pendingRole from register
+        const pending = sessionStorage.getItem('pendingRole');
+        if (pending) {
+            selectRole(pending);
+            sessionStorage.removeItem('pendingRole'); // clear after use
+        }
+
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const role = sessionStorage.getItem('pendingRole') || 'customer';
-            window.login(role); 
+            window.login(selectedRole); 
             window.showToast('تم تسجيل الدخول بنجاح');
         });
     </script></body>

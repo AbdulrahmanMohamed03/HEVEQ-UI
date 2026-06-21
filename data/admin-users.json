@@ -1,0 +1,188 @@
+[
+  {
+    "id": "USR-0001",
+    "first_name": "أحمد",
+    "last_name": "العتيبي",
+    "email": "ahmed.ot@gmail.com",
+    "phone": "+966 50 123 4567",
+    "role": 0,
+    "role_ar": "عميل",
+    "role_name": "customer",
+    "is_active": true,
+    "is_phone_verified": true,
+    "is_email_verified": true,
+    "created_at": "2025-01-15T10:00:00Z",
+    "trust_score": 92.5,
+    "approval_status": "WaitingAdminApproval",
+    "approval_status_ar": "بانتظار موافقة الإدارة",
+    "customer_profile": {
+      "requires_verification": false,
+      "total_bookings": 24,
+      "cancellation_rate": 0.0416,
+      "dispute_frequency_score": 1.2,
+      "payment_failure_count": 0,
+      "review_authenticity_score": 98.0,
+      "trust_score_history": [
+        {"event": "حساب منشأ", "score": 100.0, "date": "2025-01-15"},
+        {"event": "إلغاء حجز BK-092", "score": 90.0, "date": "2025-03-12"},
+        {"event": "اكتمال 10 حجوزات", "score": 92.5, "date": "2025-05-20"}
+      ]
+    },
+    "activity_timeline": [
+      {"type": "registration", "title": "إنشاء الحساب", "description": "تم تسجيل الحساب بنجاح عبر الجوال", "date": "15 يناير 2025"},
+      {"type": "booking", "title": "حجز معدة #BK-1001", "description": "حجز ونش 50 طن من المقاولون العرب بمبلغ 5400 ريال", "date": "20 يونيو 2026"},
+      {"type": "ticket", "title": "فتح تذكرة #TCK-5510", "description": "تقديم استفسار بخصوص دفعة الضمان المالي", "date": "21 يونيو 2026"}
+    ]
+  },
+  {
+    "id": "USR-0002",
+    "first_name": "شركة السويدي",
+    "last_name": "للإلكترونيات",
+    "email": "info@elsewedy.com",
+    "phone": "+966 11 444 8888",
+    "role": 1,
+    "role_ar": "مزود خدمة",
+    "role_name": "provider",
+    "is_active": true,
+    "is_phone_verified": true,
+    "is_email_verified": true,
+    "created_at": "2024-08-10T08:30:00Z",
+    "trust_score": 98.0,
+    "approval_status": "UnderAiReview",
+    "approval_status_ar": "قيد مراجعة الـ AI",
+    "provider_profile": {
+      "company_name": "شركة السويدي للكهرباء والحلول الصناعية",
+      "onboarding_tier": 3,
+      "onboarding_tier_ar": "الدرجة الأولى الممتازة",
+      "average_rating": 4.85,
+      "total_reviews": 142,
+      "completed_bookings": 320,
+      "response_rate": 96.5,
+      "trust_level": 3,
+      "trust_level_ar": "مزود موثوق فئة أولى (TopProvider)",
+      "trust_score_history": [
+        {"event": "حساب منشأ", "score": 90.0, "date": "2024-08-10"},
+        {"event": "تجاوز 100 حجز بنجاح", "score": 96.0, "date": "2025-02-14"},
+        {"event": "استجابة سريعة متتالية", "score": 98.0, "date": "2025-06-01"}
+      ]
+    },
+    "activity_timeline": [
+      {"type": "registration", "title": "تسجيل مزود", "description": "اكتمال التدقيق الورقي والتسجيل بالمنصة", "date": "10 أغسطس 2024"},
+      {"type": "equipment", "title": "إضافة معدة جديدة", "description": "إضافة 'مولد كهرباء 500 كيلوواط' لقائمة الخدمات", "date": "12 سبتمبر 2024"},
+      {"type": "booking", "title": "قبول مهمة #BK-1002", "description": "بدء صيانة مولد كهرباء للعميل خالد", "date": "18 يونيو 2026"}
+    ]
+  },
+  {
+    "id": "USR-0003",
+    "first_name": "عبد الرحمن",
+    "last_name": "الرشيد",
+    "email": "a.alrasheed@sharegear.com",
+    "phone": "+966 55 987 6543",
+    "role": 2,
+    "role_ar": "مدير النظام",
+    "role_name": "admin",
+    "is_active": true,
+    "is_phone_verified": true,
+    "is_email_verified": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "trust_score": 100.0,
+    "approval_status": "Verified",
+    "approval_status_ar": "موثق معتمد",
+    "activity_timeline": [
+      {"type": "system", "title": "تعيين كمدير", "description": "منح صلاحيات الإدارة الشاملة للمنصة", "date": "1 يناير 2024"}
+    ]
+  },
+  {
+    "id": "USR-0004",
+    "first_name": "سعد",
+    "last_name": "الشهراني",
+    "email": "s.shahrani@sharegear.com",
+    "phone": "+966 54 888 1122",
+    "role": 3,
+    "role_ar": "موظف ميداني",
+    "role_name": "employee",
+    "is_active": true,
+    "is_phone_verified": true,
+    "is_email_verified": false,
+    "created_at": "2025-03-01T09:00:00Z",
+    "trust_score": 95.0,
+    "approval_status": "Verified",
+    "approval_status_ar": "موثق معتمد",
+    "employee_profile": {
+      "employee_code": "SG-EMP-04",
+      "department": "Field Operations",
+      "department_ar": "العمليات الميدانية والتحقق",
+      "assigned_governorate": "الرياض",
+      "is_available_for_dispatch": true,
+      "total_verifications": 14,
+      "total_tickets": 25
+    },
+    "activity_timeline": [
+      {"type": "registration", "title": "مباشرة عمل", "description": "الانضمام لفريق الدعم والتحقق الميداني بمحافظة الرياض", "date": "1 مارس 2025"},
+      {"type": "dispatch", "title": "مهمة تحقق #BK-098", "description": "اكتمال التحقق الميداني وإثبات التنفيذ لموقع العزيزية", "date": "15 مايو 2026"}
+    ]
+  },
+  {
+    "id": "USR-0005",
+    "first_name": "خالد",
+    "last_name": "الدوسري",
+    "email": "khalid.dos@gmail.com",
+    "phone": "+966 53 777 9999",
+    "role": 0,
+    "role_ar": "عميل",
+    "role_name": "customer",
+    "is_active": false,
+    "is_phone_verified": true,
+    "is_email_verified": false,
+    "created_at": "2025-11-20T14:20:00Z",
+    "trust_score": 45.0,
+    "approval_status": "Suspended",
+    "approval_status_ar": "موقوف مؤقتاً",
+    "customer_profile": {
+      "requires_verification": true,
+      "total_bookings": 3,
+      "cancellation_rate": 0.6666,
+      "dispute_frequency_score": 8.5,
+      "payment_failure_count": 3,
+      "review_authenticity_score": 30.0,
+      "trust_score_history": [
+        {"event": "حساب منشأ", "score": 100.0, "date": "2025-11-20"},
+        {"event": "إلغاء متكرر", "score": 60.0, "date": "2025-12-15"},
+        {"event": "فشل دفع متكرر", "score": 45.0, "date": "2026-02-10"}
+      ]
+    },
+    "activity_timeline": [
+      {"type": "registration", "title": "إنشاء حساب", "description": "تسجيل حساب عميل جديد", "date": "20 نوفمبر 2025"},
+      {"type": "suspension", "title": "تعليق الحساب", "description": "تم إيقاف تنشيط الحساب تلقائياً بسبب سلوك الدفع المشبوه والنزاعات المتكررة", "date": "15 مارس 2026"}
+    ]
+  },
+  {
+    "id": "USR-0006",
+    "first_name": "سليمان",
+    "last_name": "الخالدي",
+    "email": "s.khaldi@sharegear.com",
+    "phone": "+966 59 111 2222",
+    "role": 3,
+    "role_ar": "موظف دعم عملاء",
+    "role_name": "employee",
+    "is_active": true,
+    "is_phone_verified": true,
+    "is_email_verified": true,
+    "created_at": "2025-02-10T10:00:00Z",
+    "trust_score": 96.0,
+    "approval_status": "Verified",
+    "approval_status_ar": "موثق معتمد",
+    "employee_profile": {
+      "employee_code": "SG-EMP-02",
+      "department": "Customer Service",
+      "department_ar": "خدمة العملاء وحل المشاكل",
+      "assigned_governorate": "المنطقة الشرقية",
+      "is_available_for_dispatch": false,
+      "total_verifications": 0,
+      "total_tickets": 87
+    },
+    "activity_timeline": [
+      {"type": "registration", "title": "مباشرة عمل", "description": "التحاق بفريق الدعم وحل التذاكر", "date": "10 فبراير 2025"}
+    ]
+  }
+]

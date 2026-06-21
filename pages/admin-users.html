@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            visibility: hidden;
+            opacity: 0;
+            z-index: 2999;
+            transition: var(--transition);
+        }
+        .drawer-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .details-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 450px;
+            max-width: 100%;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            transform: translateX(-100%);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            padding: var(--s5);
+            overflow-y: auto;
+        }
+        .details-drawer.show {
+            transform: translateX(0);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: var(--s3);
+            margin-bottom: var(--s5);
+            flex-wrap: wrap;
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        /* Timeline styling */
+        .timeline {
+            border-right: 2px solid var(--border-color);
+            padding-right: var(--s4);
+            margin-top: var(--s4);
+            display: flex;
+            flex-direction: column;
+            gap: var(--s4);
+        }
+        .timeline-item {
+            position: relative;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            right: -21px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .timeline-date {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            font-weight: 700;
+            display: block;
+        }
+
+        /* Trust Score Chart */
+        .trust-chart-container {
+            margin-top: var(--s4);
+            background: rgba(244, 163, 0, 0.03);
+            border: 1px solid var(--border-color);
+            padding: var(--s4);
+            border-radius: var(--radius-sm);
+        }
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: var(--s4);
+            height: 120px;
+            margin-top: var(--s4);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+        .bar-chart-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .bar-chart-bar {
+            width: 24px;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>إدارة حسابات المستخدمين (User Management)</h1>
+                            <p>البحث وتعديل رتب وحالات العملاء، ومزودي الخدمة، والشركات والموظفين الميدانيين</p>
+                        </div>
+                    </header>
+
+                    <!-- Search and filters -->
+                    <div class="card filter-bar animate-on-scroll">
+                        <div class="filter-item">
+                            <label class="form-label">البحث عن مستخدم</label>
+                            <input type="text" class="form-input" id="search-input" placeholder="ابحث بالاسم، البريد أو الهاتف..." oninput="filterUsers()">
+                        </div>
+                        <div class="filter-item">
+                            <label class="form-label">تصفية حسب الدور</label>
+                            <select class="form-input" id="role-filter" onchange="filterUsers()">
+                                <option value="all">الكل</option>
+                                <option value="customer">العملاء (Customer)</option>
+                                <option value="provider">مزودي الخدمة (Provider)</option>
+                                <option value="employee">الموظفين الميدانيين والدعم (Employee)</option>
+                                <option value="admin">الإداريين (Admin)</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label class="form-label">حالة التنشيط</label>
+                            <select class="form-input" id="status-filter" onchange="filterUsers()">
+                                <option value="all">الكل</option>
+                                <option value="active">نشط</option>
+                                <option value="suspended">معلق / موقوف</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- User Grid -->
+                    <div class="card animate-on-scroll">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>الاسم</th>
+                                        <th>البريد الإلكتروني</th>
+                                        <th>الهاتف</th>
+                                        <th>الدور</th>
+                                        <th>تاريخ الانضمام</th>
+                                        <th>تقييم الثقة (Trust Score)</th>
+                                        <th>حالة التوثيق</th>
+                                        <th>حالة النشاط</th>
+                                        <th>الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <tr><td colspan="9" style="text-align:center; padding: 20px;">جاري تحميل مستخدمي النظام...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Side details drawer -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+    <div class="details-drawer" id="details-drawer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--s5); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            <h3 id="drawer-user-name">-</h3>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size:var(--text-xs);" onclick="closeDrawer()">إغلاق ✕</button>
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap: var(--s4);">
+            <div>
+                <strong>البريد الإلكتروني:</strong>
+                <span id="drawer-user-email" class="text-muted">-</span>
+            </div>
+            <div>
+                <strong>الهاتف:</strong>
+                <span id="drawer-user-phone" class="text-muted">-</span>
+            </div>
+            <div>
+                <strong>الدور في المنصة:</strong>
+                <span id="drawer-user-role" class="badge badge-info">-</span>
+            </div>
+            <div>
+                                <strong>تاريخ التسجيل:</strong>
+                                <span id="drawer-user-joined" class="text-muted">-</span>
+                            </div>
+                            <div>
+                                <strong>حالة التوثيق:</strong>
+                                <span id="drawer-user-approval" class="badge badge-info">-</span>
+                            </div>
+            
+            <div id="drawer-trust-section">
+                <strong>تقييم الموثوقية والأمان:</strong>
+                <div class="trust-chart-container">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>مؤشر الموثوقية الحالي</span>
+                        <strong id="drawer-trust-value" style="color: var(--primary);">92%</strong>
+                    </div>
+                    
+                    <!-- Sparkline / Bar chart placeholder -->
+                    <div class="bar-chart" id="drawer-trust-chart">
+                        <!-- Bars dynamically rendered -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="drawer-additional-profile">
+                <!-- Profile details -->
+            </div>
+
+            <div>
+                <strong>الخط الزمني للنشاطات (Timeline):</strong>
+                <div class="timeline" id="drawer-timeline">
+                    <!-- Timeline items -->
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-color); padding-top: var(--s4); margin-top: var(--s4); display:flex; flex-direction:column; gap:10px;">
+                <strong>إجراءات إشرافية (الإدارة):</strong>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button class="btn btn-primary" id="btn-verify" onclick="verifyUser()">توثيق الحساب ✓</button>
+                    <button class="btn btn-outline" id="btn-suspend" style="border-color:var(--danger); color:var(--danger);" onclick="toggleSuspension()"></button>
+                </div>
+                <div class="form-group" style="margin-top:10px;">
+                    <label class="form-label">تغيير دور المستخدم</label>
+                    <select class="form-input" id="change-role-select" onchange="changeUserRole()">
+                        <option value="0">عميل (Customer)</option>
+                        <option value="1">مزود خدمة (Provider)</option>
+                        <option value="2">مدير النظام (Admin)</option>
+                        <option value="3">موظف ميداني/دعم (Employee)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let usersData = [];
+        let filteredData = [];
+        let selectedUserId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUsers();
+        });
+
+        async function loadUsers() {
+            try {
+                usersData = await window.API.getAdminUsers();
+                filteredData = [...usersData];
+                renderUsersTable();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل مستخدمي المنصة', 'danger');
+            }
+        }
+
+        function renderUsersTable() {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = '';
+
+            if (filteredData.length > 0) {
+                filteredData.forEach(user => {
+                    const tr = document.createElement('tr');
+                    
+                    let roleBadgeClass = 'badge-info';
+                    if (user.role === 1) roleBadgeClass = 'badge-success';
+                    if (user.role === 2) roleBadgeClass = 'badge-danger';
+                    if (user.role === 3) roleBadgeClass = 'badge-warning';
+
+                    const dateStr = new Date(user.created_at).toLocaleDateString('ar-SA');
+                    const trustVal = user.trust_score !== null ? `${user.trust_score}%` : 'N/A';
+                    
+                    let approvalBadgeClass = 'badge-info';
+                    const approvalStatus = user.approval_status || 'Unverified';
+                    if (approvalStatus === 'Verified') approvalBadgeClass = 'badge-success';
+                    else if (approvalStatus === 'WaitingAdminApproval') approvalBadgeClass = 'badge-warning';
+                    else if (approvalStatus === 'Rejected' || approvalStatus === 'AiRejected') approvalBadgeClass = 'badge-danger';
+                    else if (approvalStatus === 'AiWarning') approvalBadgeClass = 'badge-warning';
+
+                    const approvalStatusAr = user.approval_status_ar || 'غير موثق';
+
+                    tr.innerHTML = `
+                        <td><strong>${user.first_name} ${user.last_name}</strong></td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td><span class="badge ${roleBadgeClass}">${user.role_ar}</span></td>
+                        <td>${dateStr}</td>
+                        <td><strong>${trustVal}</strong></td>
+                        <td><span class="badge ${approvalBadgeClass}">${approvalStatusAr}</span></td>
+                        <td>
+                            <span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">
+                                ${user.is_active ? 'نشط' : 'موقوف / معلق'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size:var(--text-xs);" onclick="openDrawer('${user.id}')">
+                                الإشراف والتفاصيل 🔍
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center;">لا يوجد نتائج تطابق معايير التصفية.</td></tr>';
+            }
+        }
+
+        function filterUsers() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const roleFilter = document.getElementById('role-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            filteredData = usersData.filter(user => {
+                const nameMatch = `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery);
+                const emailMatch = user.email.toLowerCase().includes(searchQuery);
+                const phoneMatch = user.phone.includes(searchQuery);
+                const queryMatch = nameMatch || emailMatch || phoneMatch;
+
+                let roleMatch = true;
+                if (roleFilter === 'customer') roleMatch = user.role === 0;
+                else if (roleFilter === 'provider') roleMatch = user.role === 1;
+                else if (roleFilter === 'admin') roleMatch = user.role === 2;
+                else if (roleFilter === 'employee') roleMatch = user.role === 3;
+
+                let statusMatch = true;
+                if (statusFilter === 'active') statusMatch = user.is_active === true;
+                else if (statusFilter === 'suspended') statusMatch = user.is_active === false;
+
+                return queryMatch && roleMatch && statusMatch;
+            });
+
+            renderUsersTable();
+        }
+
+        function openDrawer(id) {
+            const user = usersData.find(u => u.id === id);
+            if (!user) return;
+
+            selectedUserId = id;
+            document.getElementById('drawer-user-name').innerText = `${user.first_name} ${user.last_name}`;
+            document.getElementById('drawer-user-email').innerText = user.email;
+            document.getElementById('drawer-user-phone').innerText = user.phone;
+            
+            const roleEl = document.getElementById('drawer-user-role');
+            roleEl.innerText = user.role_ar;
+            roleEl.className = 'badge ' + (user.role === 1 ? 'badge-success' : user.role === 2 ? 'badge-danger' : user.role === 3 ? 'badge-warning' : 'badge-info');
+
+            document.getElementById('drawer-user-joined').innerText = new Date(user.created_at).toLocaleDateString('ar-SA');
+            
+            // Set details drawer verification status value
+            const approvalEl = document.getElementById('drawer-user-approval');
+            if (approvalEl) {
+                approvalEl.innerText = user.approval_status_ar || 'غير موثق';
+                let appClass = 'badge-info';
+                if (user.approval_status === 'Verified') appClass = 'badge-success';
+                else if (user.approval_status === 'WaitingAdminApproval') appClass = 'badge-warning';
+                else if (user.approval_status === 'Rejected' || user.approval_status === 'AiRejected') appClass = 'badge-danger';
+                else if (user.approval_status === 'AiWarning') appClass = 'badge-warning';
+                approvalEl.className = 'badge ' + appClass;
+            }
+            
+            // Suspend button text
+            const suspendBtn = document.getElementById('btn-suspend');
+            if (user.is_active) {
+                suspendBtn.innerText = 'تعليق الحساب 🛑';
+                suspendBtn.style.borderColor = 'var(--danger)';
+                suspendBtn.style.color = 'var(--danger)';
+                suspendBtn.style.background = 'none';
+            } else {
+                suspendBtn.innerText = 'تنشيط الحساب ✓';
+                suspendBtn.style.borderColor = 'var(--success)';
+                suspendBtn.style.color = 'var(--success)';
+                suspendBtn.style.background = 'rgba(16, 185, 129, 0.05)';
+            }
+
+            // Set select role value
+            document.getElementById('change-role-select').value = user.role;
+
+            // Render trust Score
+            const trustSection = document.getElementById('drawer-trust-section');
+            const trustChart = document.getElementById('drawer-trust-chart');
+            trustChart.innerHTML = '';
+            
+            const profile = user.customer_profile || user.provider_profile;
+            if (profile && profile.trust_score_history) {
+                trustSection.style.display = 'block';
+                document.getElementById('drawer-trust-value').innerText = `${user.trust_score}%`;
+                
+                profile.trust_score_history.forEach(hist => {
+                    const col = document.createElement('div');
+                    col.className = 'bar-chart-col';
+                    
+                    const barHeight = Math.max(10, hist.score);
+                    col.innerHTML = `
+                        <div class="bar-chart-bar" style="height: ${barHeight}px;" title="${hist.event}: ${hist.score}%"></div>
+                        <span style="font-size: 8px; transform: rotate(-30deg); display:block; margin-top:2px;">${hist.date}</span>
+                    `;
+                    trustChart.appendChild(col);
+                });
+            } else {
+                trustSection.style.display = 'none';
+            }
+
+            // Render additional profile tags
+            const addProfile = document.getElementById('drawer-additional-profile');
+            addProfile.innerHTML = '';
+            if (user.role === 0 && user.customer_profile) {
+                const cp = user.customer_profile;
+                addProfile.innerHTML = `
+                    <div style="background: rgba(0,0,0,0.02); padding:10px; border-radius:8px; font-size:var(--text-xs);">
+                        <strong>بيانات ملف العميل:</strong>
+                        <div style="margin-top:5px;">الحجوزات الإجمالية: ${cp.total_bookings} | نسبة الإلغاء: ${(cp.cancellation_rate * 100).toFixed(1)}%</div>
+                        <div>فشل الدفعات: ${cp.payment_failure_count} | تقييم المراجعات الزائفة: ${cp.review_authenticity_score}%</div>
+                        <div style="margin-top:3px; color: ${cp.requires_verification ? 'var(--danger)' : 'var(--success)'};">
+                            يتطلب فحص إضافي: ${cp.requires_verification ? 'نعم (مؤشر ثقة منخفض)' : 'لا'}
+                        </div>
+                    </div>
+                `;
+            } else if (user.role === 1 && user.provider_profile) {
+                const pp = user.provider_profile;
+                addProfile.innerHTML = `
+                    <div style="background: rgba(0,0,0,0.02); padding:10px; border-radius:8px; font-size:var(--text-xs);">
+                        <strong>بيانات ملف المزود:</strong>
+                        <div style="margin-top:5px;">اسم المنشأة: ${pp.company_name}</div>
+                        <div>مستوى الضمان: ${pp.trust_level_ar}</div>
+                        <div>متوسط التقييم: ${pp.average_rating}⭐ | نسبة الرد: ${pp.response_rate}%</div>
+                        <div>عدد الصفقات المكتملة: ${pp.completed_bookings}</div>
+                    </div>
+                `;
+            } else if (user.role === 3 && user.employee_profile) {
+                const ep = user.employee_profile;
+                addProfile.innerHTML = `
+                    <div style="background: rgba(0,0,0,0.02); padding:10px; border-radius:8px; font-size:var(--text-xs);">
+                        <strong>بيانات الموظف الميداني:</strong>
+                        <div style="margin-top:5px;">كود الموظف: ${ep.employee_code} | القسم: ${ep.department_ar}</div>
+                        <div>المنطقة الجغرافية: ${ep.assigned_governorate}</div>
+                        <div>متاح للتحقق الميداني: ${ep.is_available_for_dispatch ? 'نعم' : 'لا'}</div>
+                    </div>
+                `;
+            }
+
+            // Render Timeline
+            const timelineEl = document.getElementById('drawer-timeline');
+            timelineEl.innerHTML = '';
+            if (user.activity_timeline && user.activity_timeline.length > 0) {
+                user.activity_timeline.forEach(act => {
+                    const item = document.createElement('div');
+                    item.className = 'timeline-item';
+                    item.innerHTML = `
+                        <span class="timeline-date">${act.date}</span>
+                        <strong>${act.title}</strong>
+                        <p style="font-size: var(--text-xs); color:var(--text-muted); margin-top:2px;">${act.description}</p>
+                    `;
+                    timelineEl.appendChild(item);
+                });
+            } else {
+                timelineEl.innerHTML = '<span class="text-muted" style="font-size:var(--text-xs);">لا يوجد نشاطات مسجلة</span>';
+            }
+
+            document.getElementById('drawer-overlay').classList.add('show');
+            document.getElementById('details-drawer').classList.add('show');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer-overlay').classList.remove('show');
+            document.getElementById('details-drawer').classList.remove('show');
+            selectedUserId = null;
+        }
+
+        function verifyUser() {
+            window.showToast(`تم توثيق الحساب للمستخدم ${selectedUserId} بنجاح.`);
+        }
+
+        function toggleSuspension() {
+            const user = usersData.find(u => u.id === selectedUserId);
+            if (!user) return;
+            
+            user.is_active = !user.is_active;
+            
+            if (user.is_active) {
+                window.showToast(`تم إلغاء تعليق الحساب للمستخدم ${user.first_name} بنجاح.`);
+            } else {
+                window.showToast(`تم تعليق الحساب للمستخدم ${user.first_name} (تعليق رخو Soft Suspension).`, 'danger');
+            }
+            
+            filterUsers();
+            openDrawer(selectedUserId); // refresh drawer state
+        }
+
+        function changeUserRole() {
+            const user = usersData.find(u => u.id === selectedUserId);
+            if (!user) return;
+            
+            const roleSelect = document.getElementById('change-role-select');
+            const newRoleVal = parseInt(roleSelect.value);
+            
+            user.role = newRoleVal;
+            
+            const rolesAr = ["عميل", "مزود خدمة", "مدير النظام", "موظف ميداني"];
+            user.role_ar = rolesAr[newRoleVal];
+            
+            window.showToast(`تم تغيير دور المستخدم ليكون: ${user.role_ar}`);
+            
+            filterUsers();
+            openDrawer(selectedUserId); // refresh drawer state
+        }
+    </script>
+</body>
+</html>

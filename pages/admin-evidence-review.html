@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراجعة إثباتات التنفيذ | شير جير (مدير)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layouts.css">
+    <style>
+        .admin-sidebar-override .sidebar { background: var(--dark); border-left: none; }
+        .admin-sidebar-override .sidebar-logo { color: white; }
+        .admin-sidebar-override .nav-link { color: rgba(255,255,255,0.7); }
+        .admin-sidebar-override .nav-link:hover, .admin-sidebar-override .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .admin-sidebar-override .sidebar-footer { border-top-color: rgba(255,255,255,0.1) !important; }
+
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--s5);
+        }
+        .evidence-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: var(--s5);
+            box-shadow: var(--shadow-sm);
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--s4);
+            margin: var(--s4) 0;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .gallery-img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Lightbox modal */
+        .lightbox {
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3100;
+        }
+        .lightbox.show {
+            display: flex;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        .reject-box {
+            display: none;
+            margin-top: var(--s3);
+            padding: var(--s4);
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: var(--radius-sm);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper admin-sidebar-override">
+        <app-sidebar></app-sidebar>
+        
+        <div class="main-content">
+            <app-navbar></app-navbar>
+
+            <main class="page-content">
+                <div class="container">
+                    <header class="section-header animate-on-scroll">
+                        <div class="section-title">
+                            <h1>مراجعة إثباتات التنفيذ (Job Completion Evidence)</h1>
+                            <p>تدقيق الصور والتقارير المرفوعة من قبل المزود عند الانتهاء من العمل لتسوية الحسابات المالية وتحرير الضمان</p>
+                        </div>
+                    </header>
+
+                    <div class="evidence-grid animate-on-scroll" id="evidence-container">
+                        <div class="card" style="text-align:center; padding: 40px;">جاري تحميل استمارات إثبات التنفيذ...</div>
+                    </div>
+                </div>
+            </main>
+            
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox-modal" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Zoomed Photo">
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/components/app-navbar.js"></script>
+    <script src="../js/components/app-sidebar.js"></script>
+    <script src="../js/components/app-footer.js"></script>
+    <script>
+        let evidenceData = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadEvidence();
+        });
+
+        async function loadEvidence() {
+            try {
+                evidenceData = await window.API.getAdminEvidence();
+                renderEvidence();
+            } catch (err) {
+                console.error(err);
+                window.showToast('فشل تحميل استمارات إثبات التنفيذ', 'danger');
+            }
+        }
+
+        function renderEvidence() {
+            const container = document.getElementById('evidence-container');
+            container.innerHTML = '';
+
+            if (evidenceData.length > 0) {
+                evidenceData.forEach(ev => {
+                    const card = document.createElement('div');
+                    card.className = 'evidence-card';
+                    card.id = `evidence-card-${ev.id}`;
+                    
+                    let statusBadgeClass = 'badge-info';
+                    if (ev.status === 3) statusBadgeClass = 'badge-success'; // Accepted
+                    if (ev.status === 4) statusBadgeClass = 'badge-danger'; // Rejected
+                    if (ev.status === 2) statusBadgeClass = 'badge-warning'; // Under review
+
+                    let bookingStatusBadge = 'badge-info';
+                    if (ev.booking_status === 'Disputed') bookingStatusBadge = 'badge-danger';
+                    if (ev.booking_status === 'Completed') bookingStatusBadge = 'badge-success';
+
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:15px;">
+                            <div>
+                                <span style="font-weight:700; color:var(--primary);">استمارة رقم: #${ev.id}</span>
+                                <h3 style="margin-top:5px;">رقم الحجز المرتبط: <a href="admin-tickets.html" style="color:var(--primary);">${ev.booking_id}</a></h3>
+                            </div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span class="badge ${bookingStatusBadge}">حالة الحجز: ${ev.booking_status_ar}</span>
+                                <span class="badge ${statusBadgeClass}" id="badge-status-${ev.id}">الحالة: ${ev.status_ar}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="font-size:var(--text-sm); line-height:1.6;">
+                            <div><strong>المزود مقدم الإثبات:</strong> ${ev.provider_name}</div>
+                            <div style="margin-top:5px;"><strong>تاريخ التقديم:</strong> ${new Date(ev.submitted_at).toLocaleString('ar-SA')}</div>
+                            <div style="margin-top:10px; background:var(--bg-main); padding:12px; border-radius:8px;">
+                                <strong>📝 ملاحظات المزود:</strong>
+                                <p style="margin-top:5px; color:var(--text-main);">${ev.provider_notes}</p>
+                            </div>
+                        </div>
+
+                        <!-- Gallery -->
+                        <div style="margin-top:15px;">
+                            <strong>📸 صور إثبات التنفيذ (JobCompletionEvidencePhotos):</strong>
+                            <div class="gallery">
+                                ${ev.photos.map(p => `
+                                    <div style="text-align:center;">
+                                        <img class="gallery-img" src="${p.photo_url}" alt="${p.caption}" onclick="zoomPhoto('${p.photo_url}')">
+                                        <span style="font-size:10px; color:var(--text-muted); display:block; margin-top:3px;">${p.caption}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Rejection note box -->
+                        <div class="reject-box" id="reject-box-${ev.id}">
+                            <label class="form-label" style="color:var(--danger);">ملاحظة الرفض الإداري (مطلوب)</label>
+                            <input type="text" class="form-input" id="reject-note-input-${ev.id}" placeholder="اكتب سبب الرفض بالتفصيل لمشاركته مع المزود..." value="${ev.admin_review_note}">
+                        </div>
+
+                        <!-- Actions -->
+                        <div style="border-top:1px solid var(--border-color); padding-top:15px; margin-top:15px; display:flex; justify-content:flex-end; gap:10px;" id="action-panel-${ev.id}">
+                            ${ev.status === 1 || ev.status === 2 ? `
+                                <button class="btn btn-outline" onclick="markUnderReview('${ev.id}')" ${ev.status === 2 ? 'disabled' : ''}>تمييز قيد المراجعة ⏳</button>
+                                <button class="btn btn-primary" style="background:var(--success); box-shadow:none;" onclick="acceptEvidence('${ev.id}')">قبول الإثبات وتمريره 👍</button>
+                                <button class="btn btn-primary" style="background:var(--danger); box-shadow:none;" id="btn-reject-trigger-${ev.id}" onclick="showRejectBox('${ev.id}')">رفض الإثبات ❌</button>
+                                <button class="btn btn-primary" style="background:var(--danger); box-shadow:none; display:none;" id="btn-reject-confirm-${ev.id}" onclick="rejectEvidence('${ev.id}')">تأكيد الرفض ❌</button>
+                            ` : `
+                                <div style="font-size:var(--text-xs); color:var(--text-muted);">
+                                    <strong>ملاحظة المراجع الإداري:</strong> ${ev.admin_review_note || 'لا يوجد ملاحظات إضافية'}
+                                </div>
+                            `}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                container.innerHTML = '<div class="card" style="text-align:center; padding: 40px;">لا يوجد إثباتات تنفيذ بانتظار التدقيق.</div>';
+            }
+        }
+
+        function zoomPhoto(url) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-modal').classList.add('show');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.remove('show');
+        }
+
+        function markUnderReview(id) {
+            const ev = evidenceData.find(e => e.id === id);
+            if (!ev) return;
+            
+            ev.status = 2; // Under review
+            ev.status_ar = "قيد المراجعة الإدارية (UnderAdminReview)";
+            
+            window.showToast(`تم تغيير استمارة الإثبات #${id} لتكون قيد المراجعة الآن.`);
+            renderEvidence();
+        }
+
+        function showRejectBox(id) {
+            document.getElementById(`reject-box-${id}`).style.display = 'block';
+            document.getElementById(`btn-reject-trigger-${id}`).style.display = 'none';
+            document.getElementById(`btn-reject-confirm-${id}`).style.display = 'inline-flex';
+        }
+
+        function rejectEvidence(id) {
+            const noteInput = document.getElementById(`reject-note-input-${id}`);
+            const note = noteInput.value.trim();
+            if (!note) {
+                window.showToast('ملاحظة الرفض مطلوبة للرفض', 'warning');
+                return;
+            }
+            
+            const ev = evidenceData.find(e => e.id === id);
+            if (!ev) return;
+
+            ev.status = 4; // Rejected
+            ev.status_ar = "مرفوض (RejectedAsEvidence)";
+            ev.admin_review_note = note;
+            ev.booking_status = "Disputed"; // Force dispute
+            ev.booking_status_ar = "نزاع قائم (Disputed)";
+
+            window.showToast(`تم رفض إثبات التنفيذ #${id} بنجاح، وتمت إعادة توجيه حالة الحجز للنزاعات.`, 'danger');
+            renderEvidence();
+        }
+
+        function acceptEvidence(id) {
+            const ev = evidenceData.find(e => e.id === id);
+            if (!ev) return;
+
+            ev.status = 3; // Accepted
+            ev.status_ar = "مقبول كإثبات تشغيل";
+            ev.booking_status = "Completed";
+            ev.booking_status_ar = "مكتمل ومؤكد";
+
+            window.showToast(`تم قبول إثبات التنفيذ #${id}. الحجز رقم ${ev.booking_id} جاهز لتحرير الضمان المالي لمزود الخدمة.`);
+            renderEvidence();
+        }
+    </script>
+</body>
+</html>

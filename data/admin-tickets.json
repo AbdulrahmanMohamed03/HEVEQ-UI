@@ -1,0 +1,150 @@
+[
+  {
+    "id": "TCK-5510",
+    "ticket_number": "TCK-5510",
+    "subject": "المولد يتوقف بعد نصف ساعة من التشغيل والعمل معطل",
+    "submitted_by_id": "USR-0001",
+    "submitted_by_name": "أحمد العتيبي",
+    "assigned_to_id": "USR-0004",
+    "assigned_to_name": "سعد الشهراني",
+    "booking_id": "BK-1002",
+    "category": 0,
+    "category_ar": "جودة الخدمة (ServiceQuality)",
+    "priority": 2,
+    "priority_ar": "مرتفعة",
+    "status": 1,
+    "status_ar": "قيد المتابعة (InProgress)",
+    "admin_response_deadline": "2026-06-21T18:00:00Z",
+    "sla_badge_class": "badge-warning",
+    "sla_message": "متبقي ساعتان للرد",
+    "ai_summary": "يشتكي المستأجر من تعطل مولد الكهرباء سعة 500 كيلوواط بعد 30 دقيقة عمل، مما أدى لتعليق الوردية بالكامل بالموقع. يطالب بتعويض مالي وإحضار فني بديل.",
+    "ai_identified_issue": "توقف متكرر ومفاجئ للمعدة (Engine Cooling failure suspected)",
+    "ai_claimed_impact": "توقف وردية عمل كاملة لـ 8 عمال بالموقع وخسائر غير مباشرة",
+    "ai_escalation_priority": 2,
+    "messages": [
+      {
+        "id": "MSG-9001",
+        "sender_id": "USR-0001",
+        "sender_name": "أحمد العتيبي",
+        "sender_role": "Customer",
+        "body": "السلام عليكم، المولد الذي استأجرته من شركة السويدي بالأمس يتعطل باستمرار بعد 30 دقيقة فقط من التشغيل، أرجو إرسال فني للصيانة فوراً أو استرداد كامل المبلغ حيث أن وردية العمل متوقفة تماماً.",
+        "is_internal": false,
+        "created_at": "2026-06-21T10:00:00Z"
+      },
+      {
+        "id": "MSG-9002",
+        "sender_id": "USR-0004",
+        "sender_name": "سعد الشهراني",
+        "sender_role": "Admin",
+        "body": "ملاحظة داخلية: تم فحص تقرير الصيانة السابق للمزود، ويبدو أنه قام بتأجير المعدة دون فحص الفلتر. قمنا بإخطار المزود لتقديم رد رسمي.",
+        "is_internal": true,
+        "created_at": "2026-06-21T10:15:00Z"
+      },
+      {
+        "id": "MSG-9003",
+        "sender_id": "USR-0002",
+        "sender_name": "مجموعة السويدي",
+        "sender_role": "Provider",
+        "body": "المولد تم تسليمه وهو يعمل بكفاءة كاملة. نعتقد أن العميل قام بتحميل المولد فوق طاقته التشغيلية مما تسبب في إيقافه التلقائي لحماية المحرك.",
+        "is_internal": false,
+        "created_at": "2026-06-21T11:00:00Z"
+      }
+    ],
+    "attachments": [
+      {
+        "id": "ATT-001",
+        "file_name": "engine_fault_meter.jpg",
+        "file_url": "../assets/engine_fault_meter.jpg",
+        "file_type": "صورة لوحة القيادة وهي تظهر تنبيه الحرارة",
+        "uploaded_by": "أحمد العتيبي"
+      }
+    ]
+  },
+  {
+    "id": "TCK-5511",
+    "ticket_number": "TCK-5511",
+    "subject": "خلاف حول تسليم معدة الجرافة بعد انتهاء مدة العمل",
+    "submitted_by_id": "USR-0002",
+    "submitted_by_name": "شركة السويدي للكهرباء",
+    "assigned_to_id": null,
+    "assigned_to_name": "غير معين",
+    "booking_id": "BK-2202",
+    "category": 5,
+    "category_ar": "خلاف على تسليم العمل (CompletionDispute)",
+    "priority": 1,
+    "priority_ar": "متوسطة",
+    "status": 0,
+    "status_ar": "مفتوح (Open)",
+    "admin_response_deadline": "2026-06-22T10:00:00Z",
+    "sla_badge_class": "badge-success",
+    "sla_message": "متبقي 18 ساعة للرد",
+    "ai_summary": "يدعي مزود الخدمة اكتمال العمل وتسليم المعدة، بينما يرفض العميل إرسال كود التأكيد مدعياً وجود أعمال متبقية غير منفذة.",
+    "ai_identified_issue": "خلاف على تسليم العمل وإخلاء طرف الموقع",
+    "ai_claimed_impact": "حجز أموال الضمان المالي للمزود دون وجه حق",
+    "ai_escalation_priority": 1,
+    "messages": [
+      {
+        "id": "MSG-9010",
+        "sender_id": "USR-0002",
+        "sender_name": "شركة السويدي للإلكترونيات",
+        "sender_role": "Provider",
+        "body": "لقد أكملنا العمل تماماً وفقاً لشروط الحجز ووقع المشرف بالموقع على الاستلام، ولكن العميل يرفض إعطائنا تأكيد الإغلاق في التطبيق لتحرير الأموال في الضمان. أرجو التدخل.",
+        "is_internal": false,
+        "created_at": "2026-06-21T15:00:00Z"
+      }
+    ],
+    "attachments": [
+      {
+        "id": "ATT-002",
+        "file_name": "signed_site_delivery.pdf",
+        "file_url": "../assets/signed_site_delivery.pdf",
+        "file_type": "مستند توقيع المشرف",
+        "uploaded_by": "شركة السويدي"
+      }
+    ]
+  },
+  {
+    "id": "TCK-5509",
+    "ticket_number": "TCK-5509",
+    "subject": "محاولة احتيال وسلوك دفع مشبوه من الحساب",
+    "submitted_by_id": "USR-0004",
+    "submitted_by_name": "سعد الشهراني",
+    "assigned_to_id": "USR-0003",
+    "assigned_to_name": "عبد الرحمن الرشيد",
+    "booking_id": null,
+    "category": 3,
+    "category_ar": "احتيال (Fraud)",
+    "priority": 3,
+    "priority_ar": "حرجة جداً",
+    "status": 5,
+    "status_ar": "محلول (Resolved)",
+    "admin_response_deadline": "2026-06-20T10:00:00Z",
+    "sla_badge_class": "badge-danger",
+    "sla_message": "تم الإغلاق وحظر الحساب",
+    "ai_summary": "تم تعليق حساب العميل خالد الدوسري نظراً لتكرار فشل عمليات الدفع ومحاولة تمرير بطاقات ائتمانية غير صالحة ثلاث مرات متتالية.",
+    "ai_identified_issue": "تكرار فشل الدفع واستخدام بطاقات مشبوهة",
+    "ai_claimed_impact": "تهديد أمني لعمليات الدفع بالمنصة",
+    "ai_escalation_priority": 3,
+    "messages": [
+      {
+        "id": "MSG-9020",
+        "sender_id": "USR-0004",
+        "sender_name": "سعد الشهراني",
+        "sender_role": "Employee",
+        "body": "تمت مراجعة سجلات العميل خالد الدوسري ورصد 3 محاولات فاشلة ببطاقات مختلفة. بناءً على السياسة تم تفعيل تعليق الحساب مؤقتاً.",
+        "is_internal": true,
+        "created_at": "2026-06-20T08:00:00Z"
+      },
+      {
+        "id": "MSG-9021",
+        "sender_id": "USR-0003",
+        "sender_name": "عبد الرحمن الرشيد",
+        "sender_role": "Admin",
+        "body": "تم اعتماد تعليق الحساب بشكل دائم وتعيين الحالة 'محلول ومغلق'.",
+        "is_internal": false,
+        "created_at": "2026-06-20T09:30:00Z"
+      }
+    ],
+    "attachments": []
+  }
+]
