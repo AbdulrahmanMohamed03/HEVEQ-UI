@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 4. Initial Auth Check for protected pages
-    const publicPages = ['login.html', 'register.html', 'forgot-password.html', 'index.html', 'marketplace.html', 'product-details.html', 'search-results.html', 'otp-verification.html', 'service-categories.html', 'service-details.html'];
+    const publicPages = ['login.html', 'register.html', 'forgot-password.html', 'index.html', 'marketplace.html', 'services.html', 'product-details.html', 'search-results.html', 'otp-verification.html', 'service-categories.html', 'service-details.html'];
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
     
     const isProtected = !publicPages.includes(currentPath) && currentPath !== '';
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isProtected && !window.isAuthenticated()) {
         window.navigateTo('login.html');
     } else if (window.isAuthenticated()) {
-        const role = localStorage.getItem('userRole');
+        const role = window.getUserRole();
         if (role === 'customer' || role === 'provider') {
             const isVerified = localStorage.getItem('isVerified_' + role) === 'true';
             const verificationPages = ['customer-verification.html', 'provider-verification.html'];
@@ -60,30 +60,76 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* Authentication Helpers */
+window.normalizeRole = (role) => {
+    if (!role) return 'customer';
+    if (Array.isArray(role)) {
+        role = role[0];
+    }
+    if (typeof role !== 'string') {
+        role = String(role);
+    }
+    const clean = role.trim().toLowerCase();
+    if (clean === 'customer') return 'customer';
+    if (clean === 'provider') return 'provider';
+    if (clean === 'admin') return 'admin';
+    if (clean === 'employee') return 'employee';
+    return clean;
+};
+
+window.getUserRole = () => {
+    return window.normalizeRole(localStorage.getItem('userRole') || 'customer');
+};
+
 window.isAuthenticated = () => {
     return localStorage.getItem('isLoggedIn') === 'true';
 };
 
-window.login = (role = 'customer') => {
+window.login = (authData = 'customer') => {
+    let role = 'customer';
+    if (authData && typeof authData === 'object') {
+        if (authData.roles) {
+            role = authData.roles;
+        } else if (authData.role) {
+            role = authData.role;
+        }
+        if (authData.userName) {
+            localStorage.setItem('userName', authData.userName);
+        }
+        if (authData.email) {
+            localStorage.setItem('userEmail', authData.email);
+        }
+        if (authData.userId) {
+            localStorage.setItem('userId', authData.userId);
+        }
+        if (authData.accessToken) {
+            localStorage.setItem('sg_token', authData.accessToken);
+        }
+    } else if (typeof authData === 'string') {
+        role = authData;
+    }
+
+    const normalized = window.normalizeRole(role);
     localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userRole', role);
-    localStorage.setItem('sg_token', 'mock_token_' + Date.now());
+    localStorage.setItem('userRole', normalized);
+    if (!localStorage.getItem('sg_token')) {
+        localStorage.setItem('sg_token', 'mock_token_' + Date.now());
+    }
     
-    if (role === 'admin') {
+    if (normalized === 'admin' || normalized === 'employee') {
         window.navigateTo('admin.html');
     } else {
-        const isVerified = localStorage.getItem('isVerified_' + role) === 'true';
+        const isVerified = localStorage.getItem('isVerified_' + normalized) === 'true';
         if (!isVerified) {
-            if (role === 'provider') {
+            if (normalized === 'provider') {
                 window.navigateTo('provider-verification.html');
             } else {
                 window.navigateTo('customer-verification.html');
             }
         } else {
-            if (role === 'provider') {
+            if (normalized === 'provider') {
                 window.navigateTo('provider-dashboard.html');
             } else {
-                window.navigateTo('dashboard.html');
+                window.navigateTo('index.html');
             }
         }
     }
@@ -93,6 +139,9 @@ window.logout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userRole');
     localStorage.removeItem('sg_token');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userId');
     window.navigateTo('login.html');
 };
 

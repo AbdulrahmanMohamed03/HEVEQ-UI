@@ -1,3 +1,12 @@
+function isInternalDashboardPage(currentPage) {
+    const dashboardPages = [
+        'dashboard.html', 'bookings.html', 'wallet.html', 'messages.html', 'profile.html', 'settings.html',
+        'provider-dashboard.html', 'active-jobs.html', 'equipment.html', 'booking-requests.html', 'earnings.html',
+        'admin.html'
+    ];
+    return dashboardPages.includes(currentPage) || currentPage.startsWith('admin-');
+}
+
 class AppNavbar extends HTMLElement {
     constructor() {
         super();
@@ -11,6 +20,9 @@ class AppNavbar extends HTMLElement {
     setupEventListeners() {
         const themeToggle = this.querySelector('#theme-toggle');
         const mobileMenuBtn = this.querySelector('#mobile-menu-btn');
+        const userMenuTrigger = this.querySelector('#user-menu-trigger');
+        const userDropdownMenu = this.querySelector('#user-dropdown-menu');
+        const logoutBtn = this.querySelector('#nav-logout-btn');
 
         if (themeToggle) {
             themeToggle.addEventListener('click', () => {
@@ -32,6 +44,34 @@ class AppNavbar extends HTMLElement {
                 document.body.classList.toggle('sidebar-open');
             });
         }
+
+        if (userMenuTrigger && userDropdownMenu) {
+            userMenuTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const show = userDropdownMenu.classList.contains('show');
+                if (show) {
+                    userDropdownMenu.classList.remove('show');
+                    userMenuTrigger.setAttribute('aria-expanded', 'false');
+                } else {
+                    userDropdownMenu.classList.add('show');
+                    userMenuTrigger.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userMenuTrigger.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+                    userDropdownMenu.classList.remove('show');
+                    userMenuTrigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.logout();
+            });
+        }
     }
 
     render() {
@@ -42,6 +82,26 @@ class AppNavbar extends HTMLElement {
         // Determine if we are in a subdirectory
         const isSubPage = window.location.pathname.includes('/pages/');
         const basePath = isSubPage ? '../' : '';
+        const pagePath = isSubPage ? '' : 'pages/';
+
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        const isMarketplaceActive = currentPath === 'marketplace.html';
+        const isServicesActive = currentPath === 'services.html';
+
+        const role = isAuth ? window.getUserRole() : '';
+        const isCustomer = role === 'customer';
+        const showMobileBtn = isAuth && !isCustomer;
+
+        let dashboardLink = 'dashboard.html';
+        let dashboardLabel = 'لوحة التحكم';
+        if (role === 'provider') {
+            dashboardLink = 'provider-dashboard.html';
+        } else if (role === 'admin' || role === 'employee') {
+            dashboardLink = 'admin.html';
+            dashboardLabel = 'مركز القيادة';
+        }
+
+        const showNavLinks = !isAuth || isCustomer || !isInternalDashboardPage(currentPath);
 
         this.innerHTML = `
             <nav class="navbar">
@@ -50,26 +110,37 @@ class AppNavbar extends HTMLElement {
                         <span>شير</span>جير
                     </a>
 
-                    <div class="nav-search">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" placeholder="ابحث عن معدات، قطع غيار، أو فنيين...">
+                    ${showNavLinks ? `
+                    <div class="navbar-links">
+                        <a href="${pagePath}marketplace.html" class="navbar-link ${isMarketplaceActive ? 'active' : ''}">السوق</a>
+                        <a href="${pagePath}services.html" class="navbar-link ${isServicesActive ? 'active' : ''}">المتجر</a>
                     </div>
+                    ` : ''}
 
                     <div class="nav-actions">
                         <button class="action-btn" id="theme-toggle" title="تغيير المظهر">${themeIcon}</button>
                         <button class="action-btn" id="lang-btn" title="تغيير اللغة">EN</button>
                         ${isAuth ? `
                             <button class="action-btn" id="notifications-btn" title="الإشعارات">🔔</button>
-                            <a href="${basePath}pages/profile.html" class="user-profile">
-                                <div class="avatar">AH</div>
-                                <span style="font-weight:700;font-size:0.9rem;" class="user-name">أحمد حسن</span>
-                            </a>
+                            <div class="user-profile-dropdown-wrapper">
+                                <div class="user-profile" id="user-menu-trigger" style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                    <div class="avatar">AH</div>
+                                    <span style="font-weight:700;font-size:0.9rem;" class="user-name">أحمد حسن</span>
+                                    <span class="dropdown-caret">▼</span>
+                                </div>
+                                <div class="dropdown-menu" id="user-dropdown-menu">
+                                    <a href="${pagePath}${dashboardLink}" class="dropdown-item">${dashboardLabel}</a>
+                                    <button class="dropdown-item logout-btn-item" id="nav-logout-btn">تسجيل الخروج</button>
+                                </div>
+                            </div>
                         ` : `
                             <a href="${basePath}pages/login.html" class="btn btn-primary btn-sm">تسجيل الدخول</a>
                         `}
-                        <button class="btn btn-primary btn-icon mobile-menu-btn" id="mobile-menu-btn">
-                            ☰
-                        </button>
+                        ${showMobileBtn ? `
+                            <button class="btn btn-primary btn-icon mobile-menu-btn" id="mobile-menu-btn">
+                                ☰
+                            </button>
+                        ` : ''}
                     </div>
                 </div>
             </nav>
@@ -90,33 +161,28 @@ class AppNavbar extends HTMLElement {
                     align-items: center;
                 }
                 .nav-brand span { color: var(--text-main); }
-                .nav-search {
-                    flex: 1;
-                    max-width: 500px;
-                    margin: 0 40px;
-                    position: relative;
+                .navbar-links {
                     display: flex;
                     align-items: center;
+                    gap: 20px;
+                    margin: 0 40px;
                 }
-                .search-icon {
-                    position: absolute;
-                    right: 15px;
-                    color: var(--text-muted);
-                }
-                .nav-search input {
-                    width: 100%;
-                    padding: 10px 45px 10px 15px;
-                    border-radius: 12px;
-                    border: 1px solid var(--border-color);
-                    background: var(--bg-main);
+                .navbar-link {
                     color: var(--text-main);
-                    font-size: 0.9rem;
+                    text-decoration: none;
+                    font-weight: 600;
+                    font-size: 0.95rem;
                     transition: var(--transition);
+                    padding: 8px 16px;
+                    border-radius: 8px;
                 }
-                .nav-search input:focus {
-                    outline: none;
-                    border-color: var(--primary);
-                    box-shadow: 0 0 0 4px rgba(244, 163, 0, 0.1);
+                .navbar-link:hover {
+                    color: var(--primary);
+                    background: rgba(244, 163, 0, 0.05);
+                }
+                .navbar-link.active {
+                    color: var(--primary);
+                    background: rgba(244, 163, 0, 0.1);
                 }
                 .nav-actions {
                     display: flex;
@@ -172,8 +238,56 @@ class AppNavbar extends HTMLElement {
                     height: 40px;
                     padding: 0;
                 }
+                .user-profile-dropdown-wrapper {
+                    position: relative;
+                }
+                .dropdown-menu {
+                    display: none;
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    right: auto;
+                    min-width: 160px;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-color);
+                    border-radius: var(--radius);
+                    box-shadow: var(--shadow-lg);
+                    margin-top: 8px;
+                    z-index: 2100;
+                    padding: 8px 0;
+                    text-align: right;
+                }
+                .dropdown-menu.show {
+                    display: block;
+                }
+                .dropdown-item {
+                    display: block;
+                    width: 100%;
+                    padding: 10px 16px;
+                    clear: both;
+                    font-weight: 600;
+                    color: var(--text-main);
+                    text-align: right;
+                    white-space: nowrap;
+                    background-color: transparent;
+                    border: 0;
+                    text-decoration: none;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                    transition: var(--transition);
+                    font-family: inherit;
+                }
+                .dropdown-item:hover {
+                    background-color: rgba(244, 163, 0, 0.05);
+                    color: var(--primary);
+                }
+                .dropdown-caret {
+                    font-size: 0.6rem;
+                    color: var(--text-muted);
+                    margin-right: 2px;
+                }
                 @media (max-width: 992px) {
-                    .nav-search { display: none; }
+                    .navbar-links { display: none; }
                     .mobile-menu-btn { display: flex !important; }
                     .user-name { display: none; }
                 }

@@ -1,3 +1,12 @@
+function isInternalDashboardPage(currentPage) {
+    const dashboardPages = [
+        'dashboard.html', 'bookings.html', 'wallet.html', 'messages.html', 'profile.html', 'settings.html',
+        'provider-dashboard.html', 'active-jobs.html', 'equipment.html', 'booking-requests.html', 'earnings.html',
+        'admin.html'
+    ];
+    return dashboardPages.includes(currentPage) || currentPage.startsWith('admin-');
+}
+
 class AppSidebar extends HTMLElement {
     constructor() {
         super();
@@ -24,9 +33,35 @@ class AppSidebar extends HTMLElement {
             return;
         }
 
+        const storedRole = window.getUserRole();
+        const type = window.normalizeRole(this.getAttribute('type') || storedRole);
+
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+
+        if (!isInternalDashboardPage(currentPath)) {
+            this.innerHTML = '';
+            this.removeSidebarClass();
+            return;
+        }
+
+        let isAllowed = false;
+        if (type === 'customer') {
+            const customerPages = ['dashboard.html', 'bookings.html', 'wallet.html', 'messages.html', 'profile.html', 'settings.html'];
+            isAllowed = customerPages.includes(currentPath);
+        } else if (type === 'provider') {
+            const providerPages = ['provider-dashboard.html', 'active-jobs.html', 'equipment.html', 'booking-requests.html', 'earnings.html', 'messages.html'];
+            isAllowed = providerPages.includes(currentPath);
+        } else if (type === 'admin' || type === 'employee') {
+            isAllowed = currentPath === 'admin.html' || currentPath.startsWith('admin-');
+        }
+
+        if (!isAllowed) {
+            this.innerHTML = '';
+            this.removeSidebarClass();
+            return;
+        }
+
         this.setupSidebarClass();
-        const storedRole = localStorage.getItem('userRole') || 'customer';
-        const type = this.getAttribute('type') || storedRole; // Use attribute or fallback to stored role
         
         // Determine if we are in a subdirectory
         const isSubPage = window.location.pathname.includes('/pages/');
@@ -53,7 +88,7 @@ class AppSidebar extends HTMLElement {
                 { icon: '💰', label: 'الأرباح', link: 'earnings.html' },
                 { icon: '💬', label: 'الرسائل', link: 'messages.html' }
             ];
-        } else if (type === 'admin') {
+        } else if (type === 'admin' || type === 'employee') {
             menuItems = [
                 { icon: '🛡️', label: 'مركز القيادة', link: 'admin.html' },
                 { icon: '🔑', label: 'مراجعة الحسابات', link: 'admin-account-verification.html' },
@@ -68,8 +103,6 @@ class AppSidebar extends HTMLElement {
                 { icon: '🔧', label: 'إعدادات المنصة', link: 'admin-platform-settings.html' }
             ];
         }
-
-        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
 
         this.innerHTML = `
             <aside class="sidebar">
